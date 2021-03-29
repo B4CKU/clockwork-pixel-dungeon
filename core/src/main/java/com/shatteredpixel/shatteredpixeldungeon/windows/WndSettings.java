@@ -106,7 +106,7 @@ public class WndSettings extends WndTabbed {
 		data = new DataTab();
 		data.setSize(width, 0);
 		height = Math.max(height, data.height());
-		add( data );
+		/*add( data );
 
 		add( new IconTab(Icons.get(Icons.DATA)){
 			@Override
@@ -115,7 +115,7 @@ public class WndSettings extends WndTabbed {
 				data.visible = data.active = value;
 				if (value) last_index = 2;
 			}
-		});
+		});*/
 
 		audio = new AudioTab();
 		audio.setSize(width, 0);
@@ -134,7 +134,7 @@ public class WndSettings extends WndTabbed {
 		langs = new LangsTab();
 		langs.setSize(width, 0);
 		height = Math.max(height, langs.height());
-		add( langs );
+		//add( langs );
 
 
 		IconTab langsTab = new IconTab(Icons.get(Icons.LANGS)){
@@ -159,7 +159,7 @@ public class WndSettings extends WndTabbed {
 			}
 
 		};
-		add( langsTab );
+		//add( langsTab );
 
 		resize(width, (int)Math.ceil(height));
 

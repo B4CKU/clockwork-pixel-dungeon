@@ -47,8 +47,8 @@ task release(dependsOn: compileForRelease, type: Jar) {
     }
 
     dependencies {
-        releaseImplementation project(':services:updates:githubUpdates')
-        releaseImplementation project(':services:news:shatteredNews')
+        releaseImplementation project(':services:updates:debugUpdates')
+        releaseImplementation project(':services:news:debugNews')
     }
 }
 
