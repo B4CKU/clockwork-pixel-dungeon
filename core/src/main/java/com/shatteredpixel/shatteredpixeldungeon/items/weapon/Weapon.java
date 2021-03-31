@@ -68,6 +68,7 @@ abstract public class Weapon extends KindOfWeapon {
 	public float    ACC = 1f;	// Accuracy modifier
 	public float	DLY	= 1f;	// Speed modifier
 	public int      RCH = 1;    // Reach modifier (only applies to melee hits)
+	public int      ENC = 0;    // Enchantment modifier
 
 	public enum Augment {
 		SPEED   (0.7f, 0.6667f),
@@ -221,7 +222,7 @@ abstract public class Weapon extends KindOfWeapon {
 	public int level() {
 		return super.level() + (curseInfusionBonus ? 1 : 0);
 	}
-	
+
 	//overrides as other things can equip these
 	@Override
 	public int buffedLvl() {
@@ -231,7 +232,13 @@ abstract public class Weapon extends KindOfWeapon {
 			return level();
 		}
 	}
-	
+
+	//returns weapon's level after adding flat level bonuses to weapons' enchantment proc chances
+	//used for enchantments only
+	public int enchantLvl() {
+		return this.buffedLvl() + ENC;
+	}
+
 	@Override
 	public Item upgrade() {
 		return upgrade(false);

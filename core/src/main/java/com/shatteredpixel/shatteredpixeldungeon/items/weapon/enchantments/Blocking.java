@@ -39,7 +39,7 @@ public class Blocking extends Weapon.Enchantment {
 	@Override
 	public int proc(Weapon weapon, Char attacker, Char defender, int damage) {
 		
-		int level = Math.max( 0, weapon.buffedLvl() );
+		int level = Math.max( 0, weapon.enchantLvl() );
 		
 		Buff.prolong(attacker, BlockBuff.class, 2 + level/2).setBlocking(level + 1);
 		

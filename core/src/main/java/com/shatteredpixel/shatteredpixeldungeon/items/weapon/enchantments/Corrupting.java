@@ -43,7 +43,7 @@ public class Corrupting extends Weapon.Enchantment {
 	
 	@Override
 	public int proc(Weapon weapon, Char attacker, Char defender, int damage) {
-		int level = Math.max( 0, weapon.buffedLvl() );
+		int level = Math.max( 0, weapon.enchantLvl() );
 		
 		// lvl 0 - 20%
 		// lvl 1 ~ 23%
