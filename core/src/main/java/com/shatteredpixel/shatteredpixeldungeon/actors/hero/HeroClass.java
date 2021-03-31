@@ -33,6 +33,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.bags.PotionBandolier;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.ScrollHolder;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.VelvetPouch;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.Food;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfFrost;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHealing;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfInvisibility;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLiquidFlame;
@@ -40,16 +41,19 @@ import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfMindVision
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfIdentify;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfLullaby;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMirrorImage;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRage;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfUpgrade;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfMagicMissile;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Blowpipe;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Dagger;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Gloves;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WornShortsword;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingKnife;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingStone;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.darts.Dart;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.DeviceCompat;
@@ -59,7 +63,8 @@ public enum HeroClass {
 	WARRIOR( "warrior", HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
 	MAGE( "mage", HeroSubClass.BATTLEMAGE, HeroSubClass.WARLOCK ),
 	ROGUE( "rogue", HeroSubClass.ASSASSIN, HeroSubClass.FREERUNNER ),
-	HUNTRESS( "huntress", HeroSubClass.SNIPER, HeroSubClass.WARDEN );
+	HUNTRESS( "huntress", HeroSubClass.SNIPER, HeroSubClass.WARDEN ),
+	SEER( "seer", HeroSubClass.SNIPER, HeroSubClass.WARDEN );
 
 	private String title;
 	private HeroSubClass[] subClasses;
@@ -91,6 +96,10 @@ public enum HeroClass {
 
 			case HUNTRESS:
 				initHuntress( hero );
+				break;
+
+			case SEER:
+				initSeer( hero );
 				break;
 		}
 
@@ -190,6 +199,19 @@ public enum HeroClass {
 		new ScrollOfLullaby().identify();
 	}
 
+	private static void initSeer( Hero hero ) {
+		(hero.belongings.weapon = new Blowpipe()).identify();
+		Dart darts = new Dart();
+		darts.quantity(2).collect();
+		Dungeon.quickslot.setSlot(0, darts);
+
+		new VelvetPouch().collect();
+		Dungeon.LimitedDrops.VELVET_POUCH.drop();
+
+		new PotionOfFrost().identify();
+		new ScrollOfMirrorImage().identify();
+	}
+
 	public String title() {
 		return Messages.get(HeroClass.class, title);
 	}
@@ -208,6 +230,8 @@ public enum HeroClass {
 				return Assets.Sprites.ROGUE;
 			case HUNTRESS:
 				return Assets.Sprites.HUNTRESS;
+			case SEER:
+				return Assets.Sprites.SEER;
 		}
 	}
 
