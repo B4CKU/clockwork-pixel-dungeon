@@ -27,7 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Crossbow;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.plants.Plant;
@@ -73,8 +73,8 @@ public class Dart extends MissileWeapon {
 	@Override
 	public int min(int lvl) {
 		if (bow != null){
-			return  4 +                    //4 base
-					bow.buffedLvl() + lvl; //+1 per level or bow level
+			return  missileModifier + 1 +  //MIS + 1 base
+					bow.buffedLvl() + lvl; //+1 per level or ranged weapon level
 		} else {
 			return  1 +     //1 base, down from 2
 					lvl;    //scaling unchanged
@@ -84,19 +84,21 @@ public class Dart extends MissileWeapon {
 	@Override
 	public int max(int lvl) {
 		if (bow != null){
-			return  12 +                       //12 base
-					3*bow.buffedLvl() + 2*lvl; //+3 per bow level, +2 per level (default scaling +2)
+			return  missileModifier*4 +                       //MIS*4 base
+					missileModifier*bow.buffedLvl() + 2*lvl;  //+MIS per ranged weapon level, +2 per level (default scaling +2)
 		} else {
 			return  2 +     //2 base, down from 5
 					2*lvl;  //scaling unchanged
 		}
 	}
 	
-	private static Crossbow bow;
+	private static Weapon bow;
+	private static int missileModifier;
 	
 	private void updateCrossbow(){
-		if (Dungeon.hero.belongings.weapon instanceof Crossbow){
-			bow = (Crossbow) Dungeon.hero.belongings.weapon;
+		if (Dungeon.hero.belongings.weapon instanceof Weapon && ((Weapon) Dungeon.hero.belongings.weapon).MIS > 0){
+			bow = (Weapon) Dungeon.hero.belongings.weapon;
+			missileModifier = Math.max(0,bow.MIS);
 		} else {
 			bow = null;
 		}

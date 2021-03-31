@@ -69,6 +69,7 @@ abstract public class Weapon extends KindOfWeapon {
 	public float	DLY	= 1f;	// Speed modifier
 	public int      RCH = 1;    // Reach modifier (only applies to melee hits)
 	public int      ENC = 0;    // Enchantment modifier
+	public int      MIS = 0;    // Dart damage scaling modifier
 
 	public enum Augment {
 		SPEED   (0.7f, 0.6667f),

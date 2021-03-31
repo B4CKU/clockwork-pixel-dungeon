@@ -24,22 +24,24 @@ package com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 
-public class Crossbow extends MeleeWeapon {
+public class Blowpipe extends MeleeWeapon {
 	
 	{
-		image = ItemSpriteSheet.CROSSBOW;
-		hitSound = Assets.Sounds.HIT;
-		hitSoundPitch = 1f;
+		image = ItemSpriteSheet.BLOWPIPE;
+		hitSound = Assets.Sounds.HIT_CRUSH;
+		hitSoundPitch = 1.3f;
 
-		MIS = 3;
+		MIS = 1;
 		//check Dart.class for additional properties
 		
-		tier = 4;
+		tier = 1;
+
+		bones = false;
 	}
 	
 	@Override
 	public int max(int lvl) {
-		return  4*(tier+1) +    //20 base, down from 25
-				lvl*(tier);     //+4 per level, down from +5
+		return  4*(tier+1) +    //8 base, down from 10
+				lvl*(tier+1);   //scaling unchanged
 	}
 }
