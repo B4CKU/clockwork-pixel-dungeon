@@ -256,6 +256,8 @@ public enum Icons {
 			return get( ROGUE );
 		case HUNTRESS:
 			return get( HUNTRESS );
+		case TINKERER:
+			return get( WARRIOR );
 		default:
 			return null;
 		}
