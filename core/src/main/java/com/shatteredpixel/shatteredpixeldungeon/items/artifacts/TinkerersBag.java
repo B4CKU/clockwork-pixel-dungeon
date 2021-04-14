@@ -40,9 +40,12 @@ import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ClockworkMinionSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.noosa.Image;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
@@ -207,9 +210,9 @@ public class TinkerersBag extends Artifact {
 
 			GameScene.add(minion, 1f);
 			Dungeon.level.occupyCell(minion);
+			Buff.affect( minion, ClockworkMinion.Charge.class );
 
 			Sample.INSTANCE.play(Assets.Sounds.EVOKE);
-			//CellEmitter.get(destpos).start(EnergyParticle.FACTORY, 0.3f, 4 );
 			minion.sprite.centerEmitter().burst(EnergyParticle.FACTORY, 10);
 			hero.sprite.operate(hero.pos);
 			hero.spend( 1f );
@@ -249,8 +252,25 @@ public class TinkerersBag extends Artifact {
 		private int bagLevel = -1;
 		private int defendingPos = -1;
 
-		private float power = 10f;
-		private boolean charged = true;
+		@Override
+		protected boolean act() {
+			Charge f = buff(Charge.class);
+			f.duration --;
+			if (!f.powered) {
+				if(f.duration > 0) {
+					spend(TICK);
+				} else {
+					die(null);
+				}
+				return true;
+			}
+			if (f.duration < 0) {
+				f.powered = false;
+				f.duration = 12f;
+				sprite.add(CharSprite.State.PARALYSED);
+			}
+			return super.act();
+		}
 
 		private void setInfo(Hero hero, int bagLevel){
 			if (bagLevel > this.bagLevel) {
@@ -344,6 +364,55 @@ public class TinkerersBag extends Artifact {
 
 				}
 				return true;
+			}
+
+		}
+
+		public static class Charge extends Buff {
+
+			private float duration = 12f;
+			private boolean powered = true;
+
+			@Override
+			public int icon() {
+				return BuffIndicator.RECHARGING;
+			}
+
+			@Override
+			public void tintIcon(Image icon) {
+				if(powered) icon.hardlight(1, 1, 0);
+				else icon.hardlight(1, 0, 0);
+			}
+
+			@Override
+			public String toString() {
+				return Messages.get(this, "name");
+			}
+
+			@Override
+			public String desc() {
+				String desc = Messages.get(this, "desc", duration);
+				if(powered) desc  += "\n\n" + Messages.get(this, "powered", duration);
+				else desc += "\n\n" + Messages.get(this, "unpowered", duration);
+				return desc;
+
+			}
+
+			private static final String DURATION	= "duration";
+			private static final String POWERED     = "powered";
+
+			@Override
+			public void storeInBundle( Bundle bundle ) {
+				super.storeInBundle( bundle );
+				bundle.put( DURATION, duration );
+				bundle.put( POWERED, powered );
+			}
+
+			@Override
+			public void restoreFromBundle( Bundle bundle ) {
+				super.restoreFromBundle( bundle );
+				duration = bundle.getInt( DURATION );
+				powered = bundle.getBoolean( POWERED );
 			}
 
 		}
