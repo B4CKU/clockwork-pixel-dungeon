@@ -177,6 +177,11 @@ public abstract class Char extends Actor {
 			return true;
 		}
 
+		//..or is completely immovable
+		if (properties().contains(Char.Property.IMMOVABLE) || c.properties().contains(Char.Property.IMMOVABLE)) {
+			return true;
+		}
+
 		//don't allow char to swap onto hazard unless they're flying
 		//you can swap onto a hazard though, as you're not the one instigating the swap
 		if (!Dungeon.level.passable[pos] && !c.flying){

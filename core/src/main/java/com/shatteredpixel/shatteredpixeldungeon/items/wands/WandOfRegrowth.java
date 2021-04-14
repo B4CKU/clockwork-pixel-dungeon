@@ -22,16 +22,29 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.wands;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Badges;
+import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.CorrosiveGas;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.ToxicGas;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Burning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Corruption;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Doom;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.RotLasher;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.NPC;
+import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
+import com.shatteredpixel.shatteredpixeldungeon.effects.particles.LeafParticle;
+import com.shatteredpixel.shatteredpixeldungeon.effects.particles.PoisonParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.Dewdrop;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
@@ -45,6 +58,10 @@ import com.shatteredpixel.shatteredpixeldungeon.plants.Sungrass;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.LotusSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.RotLasherSprite;
+import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.noosa.Image;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Callback;
@@ -60,148 +77,74 @@ public class WandOfRegrowth extends Wand {
 	{
 		image = ItemSpriteSheet.WAND_REGROWTH;
 
-		collisionProperties = Ballistica.STOP_SOLID;
-	}
-	
-	private int totChrgUsed = 0;
-	private int chargesOverLimit = 0;
-
-	ConeAOE cone;
-	int target;
-
-	@Override
-	public boolean tryToZap(Hero owner, int target) {
-		if (super.tryToZap(owner, target)){
-			this.target = target;
-			return true;
-		} else {
-			return false;
-		}
+		collisionProperties = Ballistica.STOP_TARGET | Ballistica.STOP_SOLID;
 	}
 
 	@Override
-	protected void onZap( Ballistica bolt ) {
+	protected void onZap(Ballistica bolt) {
+		Sample.INSTANCE.play(Assets.Sounds.PLANT);
 
-		ArrayList<Integer> cells = new ArrayList<>(cone.cells);
-
-		float furrowedChance = 0;
-		if (totChrgUsed >= chargeLimit(Dungeon.hero.lvl)){
-			furrowedChance = (chargesOverLimit+1)/5f;
+		Char cha = Actor.findChar(bolt.collisionPos);
+		plantGrass(bolt.collisionPos);
+		if(cha != null) {Buff.affect(cha, Vines.class).set(3f+((float)buffedLvl()/3), 2+buffedLvl());}
+		else if (curCharges > 1 && Dungeon.level.passable[bolt.collisionPos]) {
+			curCharges--;
+			VineLasher vinelasher = new VineLasher(buffedLvl());
+			vinelasher.pos = bolt.collisionPos;
+			GameScene.add(vinelasher, 1f);
+			Dungeon.level.occupyCell(vinelasher);
 		}
+		Dungeon.level.pressCell(bolt.collisionPos);
 
-		int chrgUsed = chargesPerCast();
-		int grassToPlace = Math.round((3.67f+buffedLvl()/3f)*chrgUsed);
-
-		//ignore cells which can't have anything grow in them.
-		for (Iterator<Integer> i = cells.iterator(); i.hasNext();) {
-			int cell = i.next();
-			int terr = Dungeon.level.map[cell];
-			if (!(terr == Terrain.EMPTY || terr == Terrain.EMBERS || terr == Terrain.EMPTY_DECO ||
-					terr == Terrain.GRASS || terr == Terrain.HIGH_GRASS || terr == Terrain.FURROWED_GRASS)) {
-				i.remove();
-			} else if (Char.hasProp(Actor.findChar(cell), Char.Property.IMMOVABLE)) {
-				i.remove();
-			} else if (Dungeon.level.plants.get(cell) != null){
-				i.remove();
-			} else {
-				if (terr != Terrain.HIGH_GRASS && terr != Terrain.FURROWED_GRASS) {
-					Level.set(cell, Terrain.GRASS);
-					GameScene.updateMap( cell );
-				}
-				Char ch = Actor.findChar(cell);
-				if (ch != null){
-					processSoulMark(ch, chargesPerCast());
-					Buff.prolong( ch, Roots.class, 4f * chrgUsed );
-				}
+		/*for (int i : PathFinder.NEIGHBOURS9) {
+			Char ch = Actor.findChar(bolt.collisionPos + i);
+			if (ch != null) {
+				processSoulMark(ch, chargesPerCast());
 			}
+		}*/
+
+		ArrayList<Integer> positions = new ArrayList<>();
+		for (int i : PathFinder.NEIGHBOURS9){
+			positions.add(i);
 		}
-
-		Random.shuffle(cells);
-
-		if (chargesPerCast() >= 3){
-			Lotus l = new Lotus();
-			l.setLevel(buffedLvl());
-			if (cells.contains(target) && Actor.findChar(target) == null){
-				cells.remove((Integer)target);
-				l.pos = target;
-				GameScene.add(l);
-			} else {
-				for (int i = bolt.path.size()-1; i >= 0; i--){
-					int c = bolt.path.get(i);
-					if (cells.contains(c) && Actor.findChar(c) == null){
-						cells.remove((Integer)c);
-						l.pos = c;
-						GameScene.add(l);
-						break;
+		Random.shuffle( positions );
+		int plants = 1 + buffedLvl()/2;
+		for (int i : positions){
+			if (plantGrass(bolt.collisionPos + i)){
+				if (plants > 0) {
+					plants--;
+					Char ch = Actor.findChar(bolt.collisionPos + i);
+					if (ch != null) {
+						processSoulMark(ch, chargesPerCast());
 					}
 				}
+				else {break;}
 			}
 		}
-
-		//places grass along center of cone
-		for (int cell : bolt.path){
-			if (grassToPlace > 0 && cells.contains(cell)){
-				if (Random.Float() > furrowedChance) {
-					Level.set(cell, Terrain.HIGH_GRASS);
-				} else {
-					Level.set(cell, Terrain.FURROWED_GRASS);
-				}
-				GameScene.updateMap( cell );
-				grassToPlace--;
-				//moves cell to the back
-				cells.remove((Integer)cell);
-				cells.add(cell);
-			}
-		}
-
-		if (!cells.isEmpty() && Random.Float() > furrowedChance &&
-				(Random.Int(6) < chrgUsed)){ // 16%/33%/50% chance to spawn a seed pod or dewcatcher
-			int cell = cells.remove(0);
-			Dungeon.level.plant( Random.Int(2) == 0 ? new Seedpod.Seed() : new Dewcatcher.Seed(), cell);
-		}
-
-		if (!cells.isEmpty() && Random.Float() > furrowedChance &&
-				(Random.Int(3) < chrgUsed)){ // 33%/66%/100% chance to spawn a plant
-			int cell = cells.remove(0);
-			Dungeon.level.plant((Plant.Seed) Generator.randomUsingDefaults(Generator.Category.SEED), cell);
-		}
-
-		for (int cell : cells){
-			if (grassToPlace <= 0 || bolt.path.contains(cell)) break;
-
-			if (Dungeon.level.map[cell] == Terrain.HIGH_GRASS) continue;
-
-			if (Random.Float() > furrowedChance) {
-				Level.set(cell, Terrain.HIGH_GRASS);
-			} else {
-				Level.set(cell, Terrain.FURROWED_GRASS);
-			}
-			GameScene.updateMap( cell );
-			grassToPlace--;
-		}
-
-		if (totChrgUsed < chargeLimit(Dungeon.hero.lvl)) {
-			chargesOverLimit = 0;
-			totChrgUsed += chrgUsed;
-			if (totChrgUsed > chargeLimit(Dungeon.hero.lvl)){
-				chargesOverLimit = totChrgUsed - chargeLimit(Dungeon.hero.lvl);
-				totChrgUsed = chargeLimit(Dungeon.hero.lvl);
-			}
-		} else {
-			chargesOverLimit += chrgUsed;
-		}
-
 	}
-	
-	private int chargeLimit( int heroLvl ){
-		if (level() >= 10){
-			return Integer.MAX_VALUE;
-		} else {
-			//8 charges at base, plus:
-			//2/3.33/5/7/10/14/20/30/50/110/infinite charges per hero level, based on wand level
-			float lvl = buffedLvl();
-			return Math.round(8 + heroLvl * (2+lvl) * (1f + (lvl/(10 - lvl))));
+
+	private boolean plantGrass(int cell){
+		int t = Dungeon.level.map[cell];
+		if ((t == Terrain.EMPTY || t == Terrain.EMPTY_DECO || t == Terrain.EMBERS
+				|| t == Terrain.GRASS || t == Terrain.FURROWED_GRASS)
+				&& Dungeon.level.plants.get(cell) == null){
+			Level.set(cell, Terrain.HIGH_GRASS);
+			GameScene.updateMap(cell);
+			CellEmitter.get( cell ).burst( LeafParticle.LEVEL_SPECIFIC, 4 );
+			return true;
 		}
+		return false;
+	}
+
+	@Override
+	protected void fx(Ballistica bolt, Callback callback) {
+		MagicMissile.boltFromChar(
+				curUser.sprite.parent,
+				MagicMissile.FOLIAGE_CONE,
+				curUser.sprite,
+				bolt.collisionPos,
+				callback);
+		Sample.INSTANCE.play(Assets.Sounds.ZAP);
 	}
 
 	@Override
@@ -229,50 +172,12 @@ public class WandOfRegrowth extends Wand {
 
 	}
 
-	protected void fx( Ballistica bolt, Callback callback ) {
-
-		// 4/6/8 distance
-		int maxDist = 2 + 2*chargesPerCast();
-		int dist = Math.min(bolt.dist, maxDist);
-
-		cone = new ConeAOE( bolt,
-				maxDist,
-				20 + 10*chargesPerCast(),
-				collisionProperties | Ballistica.STOP_TARGET);
-
-		//cast to cells at the tip, rather than all cells, better performance.
-		for (Ballistica ray : cone.rays){
-			((MagicMissile)curUser.sprite.parent.recycle( MagicMissile.class )).reset(
-					MagicMissile.FOLIAGE_CONE,
-					curUser.sprite,
-					ray.path.get(ray.dist),
-					null
-			);
-		}
-
-		//final zap at half distance, for timing of the actual wand effect
-		MagicMissile.boltFromChar( curUser.sprite.parent,
-				MagicMissile.FOLIAGE_CONE,
-				curUser.sprite,
-				bolt.path.get(dist/2),
-				callback );
-		Sample.INSTANCE.play( Assets.Sounds.ZAP );
-	}
-
-	@Override
-	protected int chargesPerCast() {
-		//consumes 30% of current charges, rounded up, with a minimum of one.
-		return Math.max(1, (int)Math.ceil(curCharges*0.3f));
-	}
-
 	@Override
 	public String statsDesc() {
-		String desc = Messages.get(this, "stats_desc", chargesPerCast());
-		if (isIdentified()){
-			int chargeLeft = chargeLimit(Dungeon.hero.lvl) - totChrgUsed;
-			if (chargeLeft < 10000) desc += " " + Messages.get(this, "degradation", Math.max(chargeLeft, 0));
-		}
-		return desc;
+		if (levelKnown)
+			return Messages.get(this, "stats_desc", 2+buffedLvl(), 2+buffedLvl());
+		else
+			return Messages.get(this, "stats_desc", 2, 2);
 	}
 
 	@Override
@@ -286,24 +191,112 @@ public class WandOfRegrowth extends Wand {
 		particle.x -= dst;
 		particle.y += dst;
 	}
-	
-	private static final String TOTAL = "totChrgUsed";
-	private static final String OVER = "chargesOverLimit";
-	
-	@Override
-	public void storeInBundle(Bundle bundle) {
-		super.storeInBundle(bundle);
-		bundle.put( TOTAL, totChrgUsed );
-		bundle.put( OVER, chargesOverLimit);
+
+	//Roots are based on a FlavourBuff class, so we need some copypasta here
+	public static class Vines extends Buff implements Hero.Doom {
+
+		protected float left;
+		private int damage;
+
+		private static final String LEFT	= "left";
+		private static final String DAMAGE	= "damage";
+
+		{
+			type = buffType.NEGATIVE;
+			announced = true;
+		}
+
+		@Override
+		public void storeInBundle( Bundle bundle ) {
+			super.storeInBundle( bundle );
+			bundle.put( LEFT, left );
+			bundle.put( DAMAGE, damage );
+
+		}
+
+		@Override
+		public void restoreFromBundle( Bundle bundle ) {
+			super.restoreFromBundle( bundle );
+			left = bundle.getFloat( LEFT );
+			damage = bundle.getInt( DAMAGE );
+		}
+
+		public void set( float duration, int strength ) {
+			this.left = Math.max(duration, left);
+			this.damage = Math.max(strength, damage);
+		}
+
+		public void extend( float duration ) {
+			this.left += duration;
+		}
+
+		@Override
+		public int icon() {
+			return BuffIndicator.ROOTS;
+		}
+
+		@Override
+		public String toString() {
+			return Messages.get(this, "name");
+		}
+
+		@Override
+		public String heroMessage() {
+			return Messages.get(this, "heromsg");
+		}
+
+		@Override
+		public String desc() {
+			return Messages.get(this, "desc", damage, dispTurns(left));
+		}
+
+		@Override
+		public boolean attachTo( Char target ) {
+			if (/*!target.flying &&*/ super.attachTo( target )) {
+				target.rooted = true;
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public void detach() {
+			target.rooted = false;
+			super.detach();
+		}
+
+		@Override
+		public boolean act() {
+			if (target.isAlive()) {
+
+				if(target.sprite.visible){
+					CellEmitter.get( target.pos ).burst( LeafParticle.LEVEL_SPECIFIC, 4 );
+					Sample.INSTANCE.play(Assets.Sounds.HIT);
+				}
+				target.damage( damage, this );
+				spend( TICK );
+
+				if ((left -= TICK) <= 0) {
+					detach();
+				}
+
+			} else {
+
+				detach();
+
+			}
+
+			return true;
+		}
+
+		@Override
+		public void onDeath() {
+			Dungeon.fail( getClass() );
+			GLog.n(Messages.get(this, "ondeath"));
+		}
 	}
-	
-	@Override
-	public void restoreFromBundle(Bundle bundle) {
-		super.restoreFromBundle(bundle);
-		totChrgUsed = bundle.getInt(TOTAL);
-		chargesOverLimit = bundle.getInt(OVER);
-	}
-	
+
 	public static class Dewcatcher extends Plant{
 
 		{
@@ -463,6 +456,114 @@ public class WandOfRegrowth extends Wand {
 			super.restoreFromBundle(bundle);
 			wandLvl = bundle.getInt(WAND_LVL);
 		}
+	}
+
+	public static class VineLasher extends NPC {
+		{
+			spriteClass = RotLasherSprite.class;
+
+			HP = HT = 40;
+			defenseSkill = 0;
+			state = WANDERING = new Waiting();
+
+			alignment = Alignment.ALLY;
+
+			//before other mobs
+			actPriority = MOB_PRIO + 1;
+		}
+
+		private int wandLevel;
+		private static final String WAND_LEVEL = "wand_level";
+
+		public VineLasher(int wandLvl){
+			wandLevel = wandLvl;
+			HP = HT = 12 + 4 * wandLevel;
+		}
+
+		public VineLasher(){}
+
+		@Override
+		protected boolean act() {
+			super.act();
+			HP -= (int)(HT * 0.1);
+			if (HP <= 0){
+				destroy();
+				sprite.die();
+			}
+			return true;
+		}
+
+		@Override
+		public void damage(int dmg, Object src) {
+			if (src instanceof Burning) {
+				destroy();
+				sprite.die();
+			} else {
+				super.damage(dmg, src);
+			}
+		}
+
+		@Override
+		public boolean reset() {
+			return true;
+		}
+
+		@Override
+		protected boolean getCloser(int target) {
+			return true;
+		}
+
+		@Override
+		protected boolean getFurther(int target) {
+			return true;
+		}
+
+		@Override
+		public int damageRoll() {
+			return Random.NormalIntRange(1, 2+wandLevel);
+		}
+
+		@Override
+		public int attackSkill( Char target ) {
+			return Dungeon.depth + 9;
+		}
+
+		@Override
+		public int drRoll() {
+			return Random.NormalIntRange(0, wandLevel);
+		}
+
+		@Override
+		public void storeInBundle(Bundle bundle) {
+			super.storeInBundle(bundle);
+			bundle.put(WAND_LEVEL, wandLevel);
+		}
+
+		@Override
+		public void restoreFromBundle(Bundle bundle) {
+			super.restoreFromBundle(bundle);
+			wandLevel = bundle.getInt(WAND_LEVEL);
+			HP = HT = 10 + 3 * wandLevel;
+		}
+
+		@Override
+		public String description() {
+			return Messages.get(this, "desc", wandLevel, 2+wandLevel);
+		}
+
+		{
+			properties.add(Property.IMMOVABLE);
+		}
+
+		{
+			immunities.add( ToxicGas.class );
+			immunities.add( Corruption.class );
+			immunities.add( Vines.class );
+		}
+
+		private class Waiting extends Mob.Wandering{}
+
+
 	}
 
 }
