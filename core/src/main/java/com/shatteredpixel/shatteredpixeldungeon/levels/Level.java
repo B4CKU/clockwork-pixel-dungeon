@@ -1065,7 +1065,7 @@ public abstract class Level implements Bundlable {
 			boolean[] blocking;
 			
 			if ((c instanceof Hero && ((Hero) c).subClass == HeroSubClass.WARDEN)
-				|| c instanceof YogFist.SoiledFist) {
+				|| c instanceof YogFist.SoiledFist || c instanceof WandOfRegrowth.VineLasher) {
 				blocking = Dungeon.level.losBlocking.clone();
 				for (int i = 0; i < blocking.length; i++){
 					if (blocking[i] && (Dungeon.level.map[i] == Terrain.HIGH_GRASS || Dungeon.level.map[i] == Terrain.FURROWED_GRASS)){

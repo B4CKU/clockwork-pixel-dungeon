@@ -22,46 +22,36 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.wands;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
-import com.shatteredpixel.shatteredpixeldungeon.Badges;
-import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
-import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.CorrosiveGas;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.ToxicGas;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Adrenaline;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Burning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Corruption;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Doom;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
-import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.RotLasher;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.NPC;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
-import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.LeafParticle;
-import com.shatteredpixel.shatteredpixeldungeon.effects.particles.PoisonParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.Dewdrop;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
-import com.shatteredpixel.shatteredpixeldungeon.mechanics.ConeAOE;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.plants.Plant;
-import com.shatteredpixel.shatteredpixeldungeon.plants.Sungrass;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.LotusSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.RotLasherSprite;
-import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
-import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
-import com.watabou.noosa.Image;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
+import com.watabou.noosa.Game;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Callback;
@@ -70,7 +60,6 @@ import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class WandOfRegrowth extends Wand {
 
@@ -84,31 +73,34 @@ public class WandOfRegrowth extends Wand {
 	protected void onZap(Ballistica bolt) {
 		Sample.INSTANCE.play(Assets.Sounds.PLANT);
 
+
 		Char cha = Actor.findChar(bolt.collisionPos);
 		plantGrass(bolt.collisionPos);
-		if(cha != null) {Buff.affect(cha, Vines.class).set(3f+((float)buffedLvl()/3), 2+buffedLvl());}
-		else if (curCharges > 1 && Dungeon.level.passable[bolt.collisionPos]) {
-			curCharges--;
+		//..cripples enemies hit..
+		if(cha != null) {
+			Buff.prolong( cha, Cripple.class, 8f);
+			processSoulMark(cha, chargesPerCast());
+		}
+		//..or spawns a vine lasher if there is none and the ground is suitable..
+		else if (Dungeon.level.passable[bolt.collisionPos]) {
 			VineLasher vinelasher = new VineLasher(buffedLvl());
 			vinelasher.pos = bolt.collisionPos;
-			GameScene.add(vinelasher, 1f);
+			GameScene.add(vinelasher, 0f);
 			Dungeon.level.occupyCell(vinelasher);
+			//CellEmitter.get( vinelasher.pos ).burst( LeafParticle.GENERAL, 6 );
+			vinelasher.sprite.emitter().burst(LeafParticle.GENERAL, 6);
 		}
+		//We don't want the lasher inside the grass and also it could be used for triggering traps
 		Dungeon.level.pressCell(bolt.collisionPos);
 
-		/*for (int i : PathFinder.NEIGHBOURS9) {
-			Char ch = Actor.findChar(bolt.collisionPos + i);
-			if (ch != null) {
-				processSoulMark(ch, chargesPerCast());
-			}
-		}*/
-
+		//gets 8 nearby cells, shuffles them and plants up to 1+(lvl/2) grass patches around
+		//marks mobs that had grass grown under them
 		ArrayList<Integer> positions = new ArrayList<>();
-		for (int i : PathFinder.NEIGHBOURS9){
+		for (int i : PathFinder.NEIGHBOURS8){
 			positions.add(i);
 		}
 		Random.shuffle( positions );
-		int plants = 1 + buffedLvl()/2;
+		int plants = 1 + (buffedLvl()/2);
 		for (int i : positions){
 			if (plantGrass(bolt.collisionPos + i)){
 				if (plants > 0) {
@@ -149,25 +141,23 @@ public class WandOfRegrowth extends Wand {
 
 	@Override
 	public void onHit(MagesStaff staff, Char attacker, Char defender, int damage) {
-		//like pre-nerf vampiric enchantment, except with herbal healing buff, only in grass
-		boolean grass = false;
-		int terr = Dungeon.level.map[attacker.pos];
-		if (terr == Terrain.GRASS || terr == Terrain.HIGH_GRASS || terr == Terrain.FURROWED_GRASS){
-			grass = true;
-		}
-		terr = Dungeon.level.map[defender.pos];
-		if (terr == Terrain.GRASS || terr == Terrain.HIGH_GRASS || terr == Terrain.FURROWED_GRASS){
-			grass = true;
-		}
+		//gives target a single turn of cripple, allowing lashers to attack them and gives adrenaline to the plants, so that they attack faster
+		Buff.affect(defender, Cripple.class, 1f);
 
-		if (grass) {
-			int level = Math.max(0, staff.buffedLvl());
+		for (Char ch : Actor.chars()){
+			if (ch instanceof VineLasher){
+				//if a lasher doesn't have adrenaline, apply a single turn of it, but without announcing (because how spammy it is)
+				Adrenaline a = ch.buff(Adrenaline.class);
+				if (a == null){
+					new Adrenaline(){
+					{announced = false;}
+					public static final float DURATION = 1f;
+				}.attachTo(ch);
+				//i hate that solution
+				}
 
-			// lvl 0 - 16%
-			// lvl 1 - 21%
-			// lvl 2 - 25%
-			int healing = Math.round(damage * (level + 2f) / (level + 6f) / 2f);
-			Buff.affect(attacker, Sungrass.Health.class).boost(healing);
+				ch.sprite.emitter().burst(LeafParticle.GENERAL, 3);
+			}
 		}
 
 	}
@@ -175,9 +165,9 @@ public class WandOfRegrowth extends Wand {
 	@Override
 	public String statsDesc() {
 		if (levelKnown)
-			return Messages.get(this, "stats_desc", 2+buffedLvl(), 2+buffedLvl());
+			return Messages.get(this, "stats_desc", 1+buffedLvl(), 4+2*buffedLvl());
 		else
-			return Messages.get(this, "stats_desc", 2, 2);
+			return Messages.get(this, "stats_desc", 1, 4);
 	}
 
 	@Override
@@ -190,111 +180,6 @@ public class WandOfRegrowth extends Wand {
 		float dst = Random.Float(11f);
 		particle.x -= dst;
 		particle.y += dst;
-	}
-
-	//Roots are based on a FlavourBuff class, so we need some copypasta here
-	public static class Vines extends Buff implements Hero.Doom {
-
-		protected float left;
-		private int damage;
-
-		private static final String LEFT	= "left";
-		private static final String DAMAGE	= "damage";
-
-		{
-			type = buffType.NEGATIVE;
-			announced = true;
-		}
-
-		@Override
-		public void storeInBundle( Bundle bundle ) {
-			super.storeInBundle( bundle );
-			bundle.put( LEFT, left );
-			bundle.put( DAMAGE, damage );
-
-		}
-
-		@Override
-		public void restoreFromBundle( Bundle bundle ) {
-			super.restoreFromBundle( bundle );
-			left = bundle.getFloat( LEFT );
-			damage = bundle.getInt( DAMAGE );
-		}
-
-		public void set( float duration, int strength ) {
-			this.left = Math.max(duration, left);
-			this.damage = Math.max(strength, damage);
-		}
-
-		public void extend( float duration ) {
-			this.left += duration;
-		}
-
-		@Override
-		public int icon() {
-			return BuffIndicator.ROOTS;
-		}
-
-		@Override
-		public String toString() {
-			return Messages.get(this, "name");
-		}
-
-		@Override
-		public String heroMessage() {
-			return Messages.get(this, "heromsg");
-		}
-
-		@Override
-		public String desc() {
-			return Messages.get(this, "desc", damage, dispTurns(left));
-		}
-
-		@Override
-		public boolean attachTo( Char target ) {
-			if (/*!target.flying &&*/ super.attachTo( target )) {
-				target.rooted = true;
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		@Override
-		public void detach() {
-			target.rooted = false;
-			super.detach();
-		}
-
-		@Override
-		public boolean act() {
-			if (target.isAlive()) {
-
-				if(target.sprite.visible){
-					CellEmitter.get( target.pos ).burst( LeafParticle.LEVEL_SPECIFIC, 4 );
-					Sample.INSTANCE.play(Assets.Sounds.HIT);
-				}
-				target.damage( damage, this );
-				spend( TICK );
-
-				if ((left -= TICK) <= 0) {
-					detach();
-				}
-
-			} else {
-
-				detach();
-
-			}
-
-			return true;
-		}
-
-		@Override
-		public void onDeath() {
-			Dungeon.fail( getClass() );
-			GLog.n(Messages.get(this, "ondeath"));
-		}
 	}
 
 	public static class Dewcatcher extends Plant{
@@ -464,7 +349,7 @@ public class WandOfRegrowth extends Wand {
 
 			HP = HT = 40;
 			defenseSkill = 0;
-			state = WANDERING = new Waiting();
+			state = WANDERING;
 
 			alignment = Alignment.ALLY;
 
@@ -484,45 +369,64 @@ public class WandOfRegrowth extends Wand {
 
 		@Override
 		protected boolean act() {
-			super.act();
-			HP -= (int)(HT * 0.1);
-			if (HP <= 0){
-				destroy();
-				sprite.die();
-			}
-			return true;
+			damage( Math.max( 1, (int)(HT * 0.05)), this);
+			if (!isAlive()) return true;
+			return super.act();
 		}
 
 		@Override
 		public void damage(int dmg, Object src) {
 			if (src instanceof Burning) {
-				destroy();
-				sprite.die();
+				die(this);
 			} else {
 				super.damage(dmg, src);
 			}
 		}
 
 		@Override
-		public boolean reset() {
-			return true;
-		}
-
-		@Override
 		protected boolean getCloser(int target) {
-			return true;
+			return false;
 		}
 
 		@Override
 		protected boolean getFurther(int target) {
-			return true;
+			return false;
+		}
+
+		public int minDmg(int lvl){
+			return 1+lvl;
+		}
+
+		public int maxDmg(int lvl){
+			return 4+2*lvl;
 		}
 
 		@Override
 		public int damageRoll() {
-			return Random.NormalIntRange(1, 2+wandLevel);
+			return Random.NormalIntRange(minDmg(wandLevel), maxDmg(wandLevel));
 		}
 
+		//increases the duration of roots and cripple and if the target has more than 10 turns of cripple, roots them
+		@Override
+		public int attackProc(Char enemy, int damage) {
+			damage = super.attackProc( enemy, damage );
+			if (enemy.buff(Roots.class) != null) {
+				Buff.affect( enemy, Roots.class, 1f );
+			}
+			else {
+				Cripple cripple = enemy.buff(Cripple.class);
+				if (cripple != null && cripple.cooldown() > 10f) {
+					Buff.affect( enemy, Roots.class, Cripple.DURATION);
+					Buff.detach( enemy, Cripple.class );
+				}
+				else Buff.affect( enemy, Cripple.class, 1f);
+			}
+
+
+			return super.attackProc(enemy, damage);
+		}
+
+		//basically hero accuracy given the hero levels up once every depth
 		@Override
 		public int attackSkill( Char target ) {
 			return Dungeon.depth + 9;
@@ -531,6 +435,12 @@ public class WandOfRegrowth extends Wand {
 		@Override
 		public int drRoll() {
 			return Random.NormalIntRange(0, wandLevel);
+		}
+
+		//can attack enemies within two tiles range, but only if they are stunned, crippled or paralyzed
+		@Override
+		protected boolean canAttack(Char enemy) {
+			return (enemy.buff(Cripple.class) != null || enemy.buff(Paralysis.class) != null || enemy.buff(Roots.class) != null) && (fieldOfView[enemy.pos] && Dungeon.level.distance(pos, enemy.pos) <= 2);
 		}
 
 		@Override
@@ -543,12 +453,41 @@ public class WandOfRegrowth extends Wand {
 		public void restoreFromBundle(Bundle bundle) {
 			super.restoreFromBundle(bundle);
 			wandLevel = bundle.getInt(WAND_LEVEL);
-			HP = HT = 10 + 3 * wandLevel;
+			//HP = HT = 10 + 3 * wandLevel;
+		}
+
+		@Override
+		public boolean canInteract(Char c) {
+			return true;
+		}
+
+		@Override
+		public boolean interact( Char c ) {
+			if (c != Dungeon.hero){
+				return true;
+			}
+			Game.runOnRenderThread(new Callback() {
+				@Override
+				public void call() {
+					GameScene.show(new WndOptions( Messages.get(VineLasher.this, "dismiss_title"),
+							Messages.get(VineLasher.this, "dismiss_body"),
+							Messages.get(VineLasher.this, "dismiss_confirm"),
+							Messages.get(VineLasher.this, "dismiss_cancel") ){
+						@Override
+						protected void onSelect(int index) {
+							if (index == 0){
+								die(null);
+							}
+						}
+					});
+				}
+			});
+			return true;
 		}
 
 		@Override
 		public String description() {
-			return Messages.get(this, "desc", wandLevel, 2+wandLevel);
+			return Messages.get(this, "desc", minDmg(wandLevel), maxDmg(wandLevel));
 		}
 
 		{
@@ -558,12 +497,6 @@ public class WandOfRegrowth extends Wand {
 		{
 			immunities.add( ToxicGas.class );
 			immunities.add( Corruption.class );
-			immunities.add( Vines.class );
 		}
-
-		private class Waiting extends Mob.Wandering{}
-
-
 	}
-
 }

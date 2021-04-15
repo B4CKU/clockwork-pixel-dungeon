@@ -80,7 +80,6 @@ public class Burning extends Buff implements Hero.Doom {
 	@Override
 	public boolean attachTo(Char target) {
 		Buff.detach( target, Chill.class);
-		Buff.detach( target, WandOfRegrowth.Vines.class);
 
 		return super.attachTo(target);
 	}
