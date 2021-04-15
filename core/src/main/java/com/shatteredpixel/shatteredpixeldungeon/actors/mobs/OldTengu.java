@@ -33,6 +33,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.TomeOfMastery;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.LloydsBeacon;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TinkerersBag;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.OldPrisonBossLevel;
@@ -160,6 +161,11 @@ public class OldTengu extends Mob {
 		LloydsBeacon beacon = Dungeon.hero.belongings.getItem(LloydsBeacon.class);
 		if (beacon != null) {
 			beacon.upgrade();
+		}
+
+		TinkerersBag bag = Dungeon.hero.belongings.getItem(TinkerersBag.class);
+		if (bag != null) {
+			bag.upgrade();
 		}
 		
 		yell( Messages.get(this, "defeated") );

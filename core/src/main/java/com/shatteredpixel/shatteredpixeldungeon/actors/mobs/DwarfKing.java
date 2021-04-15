@@ -44,6 +44,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Viscosity;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.LloydsBeacon;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TinkerersBag;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation;
 import com.shatteredpixel.shatteredpixeldungeon.levels.NewCityBossLevel;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
@@ -446,6 +447,11 @@ public class DwarfKing extends Mob {
 		LloydsBeacon beacon = Dungeon.hero.belongings.getItem(LloydsBeacon.class);
 		if (beacon != null) {
 			beacon.upgrade();
+		}
+
+		TinkerersBag bag = Dungeon.hero.belongings.getItem(TinkerersBag.class);
+		if (bag != null) {
+			bag.upgrade();
 		}
 
 		yell( Messages.get(this, "defeated") );

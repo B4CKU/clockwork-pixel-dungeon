@@ -48,6 +48,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.particles.EarthParticle;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.SparkParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.LloydsBeacon;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TinkerersBag;
 import com.shatteredpixel.shatteredpixeldungeon.items.quest.MetalShard;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfBlastWave;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
@@ -524,6 +525,11 @@ public class NewDM300 extends Mob {
 		LloydsBeacon beacon = Dungeon.hero.belongings.getItem(LloydsBeacon.class);
 		if (beacon != null) {
 			beacon.upgrade();
+		}
+
+		TinkerersBag bag = Dungeon.hero.belongings.getItem(TinkerersBag.class);
+		if (bag != null) {
+			bag.upgrade();
 		}
 
 		yell( Messages.get(this, "defeated") );

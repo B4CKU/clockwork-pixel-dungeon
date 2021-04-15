@@ -30,6 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LockedFloor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Ooze;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TinkerersBag;
 import com.shatteredpixel.shatteredpixeldungeon.items.keys.SkeletonKey;
 import com.shatteredpixel.shatteredpixeldungeon.items.quest.GooBlob;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -239,6 +240,11 @@ public class Goo extends Mob {
 		}
 		
 		Badges.validateBossSlain();
+
+		TinkerersBag bag = Dungeon.hero.belongings.getItem(TinkerersBag.class);
+		if (bag != null) {
+			bag.upgrade();
+		}
 		
 		yell( Messages.get(this, "defeated") );
 	}

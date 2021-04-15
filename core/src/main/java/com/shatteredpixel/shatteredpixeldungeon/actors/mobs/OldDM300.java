@@ -37,6 +37,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ElmoParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.LloydsBeacon;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TinkerersBag;
 import com.shatteredpixel.shatteredpixeldungeon.items.keys.SkeletonKey;
 import com.shatteredpixel.shatteredpixeldungeon.items.quest.MetalShard;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
@@ -162,7 +163,12 @@ public class OldDM300 extends Mob {
 		if (beacon != null) {
 			beacon.upgrade();
 		}
-		
+
+		TinkerersBag bag = Dungeon.hero.belongings.getItem(TinkerersBag.class);
+		if (bag != null) {
+			bag.upgrade();
+		}
+
 		yell( Messages.get(this, "defeated") );
 	}
 	
