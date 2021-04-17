@@ -49,6 +49,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ShadowParticle
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Gold;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.amulets.SummoningItem;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TimekeepersHourglass;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
@@ -1059,8 +1060,14 @@ public abstract class Mob extends Char {
 				((DriedRose.GhostHero) mob).clearDefensingPos();
 				level.mobs.remove( mob );
 				heldAllies.add(mob);
-				
-			//preserve intelligent allies if they are near the hero
+
+				//preserve intelligent allies if they are near the hero
+			} else if (mob instanceof SummoningItem.SummonedAlly) {
+				((SummoningItem.SummonedAlly) mob).clearDefensingPos();
+				level.mobs.remove( mob );
+				heldAllies.add(mob);
+
+				//preserve intelligent allies if they are near the hero
 			} else if (mob.alignment == Alignment.ALLY
 					&& mob.intelligentAlly
 					&& Dungeon.level.distance(Dungeon.hero.pos, mob.pos) <= 3){
