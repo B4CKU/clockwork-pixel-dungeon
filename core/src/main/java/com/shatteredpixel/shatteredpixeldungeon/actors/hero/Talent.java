@@ -463,20 +463,6 @@ public enum Talent {
 				Collections.addAll(tierTalents, INVIGORATING_MEAL, RESTORED_NATURE, REJUVENATING_STEPS, HEIGHTENED_SENSES, DURABLE_PROJECTILES);
 				break;
 			case ADVENTURER:
-				/*Talent[] tierTwoTalents = {ARMOR_WEAPON, ARMOR_ARCANE,
-						ARMOR_AGILITY, ARMOR_CRAFT,
-						ARMOR_ELEMENTS,
-						WEAPON_ARCANE, WEAPON_AGILITY,
-						WEAPON_CRAFT, WEAPON_ELEMENTS,
-						ARCANE_AGILITY, ARCANE_CRAFT,
-						ARCANE_ELEMENTS,
-						AGILITY_CRAFT, AGILITY_ELEMENTS,
-						CRAFT_ELEMENTS};
-
-				for(Talent t : tierTwoTalents){
-					if(t.requirementOne != null && Dungeon.hero.hasTalent(t.requirementOne) && t.requirementTwo != null && Dungeon.hero.hasTalent(t.requirementTwo))
-						Collections.addAll(tierTalents, t);
-				}*/
 				//technically all of them are available, but only some of them are visible at the time
 				Collections.addAll(tierTalents, ARMOR_WEAPON, ARMOR_ARCANE, ARMOR_AGILITY, ARMOR_CRAFT, ARMOR_ELEMENTS,
 												WEAPON_ARCANE, WEAPON_AGILITY, WEAPON_CRAFT, WEAPON_ELEMENTS, ARCANE_AGILITY,
