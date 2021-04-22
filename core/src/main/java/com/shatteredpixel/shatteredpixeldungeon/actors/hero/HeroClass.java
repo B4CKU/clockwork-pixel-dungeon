@@ -33,6 +33,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.bags.PotionBandolier;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.ScrollHolder;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.VelvetPouch;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.Food;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfExperience;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHealing;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfInvisibility;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLiquidFlame;
@@ -59,7 +60,8 @@ public enum HeroClass {
 	WARRIOR( "warrior", HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
 	MAGE( "mage", HeroSubClass.BATTLEMAGE, HeroSubClass.WARLOCK ),
 	ROGUE( "rogue", HeroSubClass.ASSASSIN, HeroSubClass.FREERUNNER ),
-	HUNTRESS( "huntress", HeroSubClass.SNIPER, HeroSubClass.WARDEN );
+	HUNTRESS( "huntress", HeroSubClass.SNIPER, HeroSubClass.WARDEN ),
+	ADVENTURER( "adventurer", HeroSubClass.ASSASSIN, HeroSubClass.FREERUNNER );
 
 	private String title;
 	private HeroSubClass[] subClasses;
@@ -91,6 +93,10 @@ public enum HeroClass {
 
 			case HUNTRESS:
 				initHuntress( hero );
+				break;
+
+			case ADVENTURER:
+				initAdventurer( hero );
 				break;
 		}
 
@@ -190,6 +196,20 @@ public enum HeroClass {
 		new ScrollOfLullaby().identify();
 	}
 
+	private static void initAdventurer( Hero hero ) {
+
+		(hero.belongings.weapon = new WornShortsword()).identify();
+		ThrowingStone stones = new ThrowingStone();
+		stones.quantity(3).collect();
+		Dungeon.quickslot.setSlot(0, stones);
+
+		PotionOfExperience potion = new PotionOfExperience();
+		potion.quantity(30).collect();
+
+		new VelvetPouch().collect();
+		Dungeon.LimitedDrops.VELVET_POUCH.drop();
+	}
+
 	public String title() {
 		return Messages.get(HeroClass.class, title);
 	}
@@ -208,6 +228,8 @@ public enum HeroClass {
 				return Assets.Sprites.ROGUE;
 			case HUNTRESS:
 				return Assets.Sprites.HUNTRESS;
+			case ADVENTURER:
+				return Assets.Sprites.ROGUE;
 		}
 	}
 
@@ -221,6 +243,8 @@ public enum HeroClass {
 				return Assets.Splashes.ROGUE;
 			case HUNTRESS:
 				return Assets.Splashes.HUNTRESS;
+			case ADVENTURER:
+				return Assets.Splashes.ROGUE;
 		}
 	}
 	

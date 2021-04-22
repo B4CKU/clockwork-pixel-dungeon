@@ -147,6 +147,10 @@ public class TalentsPane extends ScrollPane {
 
 			buttons = new ArrayList<>();
 			for (Talent talent : talents.keySet()){
+				if(canUpgrade){
+					if((talent.requirementOne() != null && !Dungeon.hero.hasTalent(talent.requirementOne())) || (talent.requirementTwo() != null && !Dungeon.hero.hasTalent(talent.requirementTwo()))) continue;
+				}
+
 				TalentButton btn = new TalentButton(tier, talent, talents.get(talent), canUpgrade){
 					@Override
 					public void upgradeTalent() {
@@ -202,15 +206,25 @@ public class TalentsPane extends ScrollPane {
 				left += 6;
 			}
 
-			float gap = (width - buttons.size()*TalentButton.WIDTH)/(buttons.size()+1);
+			int rows = ((buttons.size()-1)/6);
+			// code written originally by palkia for rat king pd 2, big thanks to our hero and saviour
+			int buttonsPerRow = buttons.size() / (rows+1);
+			float gap = (width - buttonsPerRow*TalentButton.WIDTH)/(buttonsPerRow+1);
+			float bottom = title.bottom();
+			int placed = 0;
 			left = x + gap;
 			for (TalentButton btn : buttons){
-				btn.setPos(left, title.bottom() + 4);
+				btn.setPos(left, bottom + 4);
 				PixelScene.align(btn);
 				left += btn.width() + gap;
+				if(++placed == buttonsPerRow && rows-- >= 0) {
+					left = x + gap;
+					bottom = btn.bottom();
+					placed = 0;
+				}
 			}
 
-			height = buttons.get(0).bottom() - y;
+			height = bottom - y;
 
 		}
 

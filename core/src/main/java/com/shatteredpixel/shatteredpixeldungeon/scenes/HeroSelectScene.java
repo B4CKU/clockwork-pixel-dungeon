@@ -422,6 +422,12 @@ public class HeroSelectScene extends PixelScene {
 							new ItemSprite(ItemSpriteSheet.GLOVES, null)
 					};
 					break;
+				case ADVENTURER:
+					tabIcons = new Image[]{
+							Icons.get(Icons.TALENT),
+							new ItemSprite(ItemSpriteSheet.WORN_SHORTSWORD, null)
+					};
+					break;
 			}
 
 			tab = new IconTab( tabIcons[0] ){

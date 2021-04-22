@@ -109,7 +109,23 @@ public enum Talent {
 	//Sniper T3
 	FARSIGHT(107, 3), SHARED_ENCHANTMENT(108, 3), SHARED_UPGRADES(109, 3),
 	//Warden T3
-	DURABLE_TIPS(110, 3), BARKSKIN(111, 3), SHIELDING_DEW(112, 3);
+	DURABLE_TIPS(110, 3), BARKSKIN(111, 3), SHIELDING_DEW(112, 3),
+
+	//Adventurer T1
+	ARMOR_MASTERY(1,1), WEAPON_MASTERY(1, 1), ARCANE_MASTERY(33, 1),
+	AGILITY_MASTERY(65, 1), CRAFT_MASTERY(97, 1), ELEMENTAL_MASTERY(97, 1),
+
+	//Adventurer T2
+	ARMOR_WEAPON(1 , 1, ARMOR_MASTERY, WEAPON_MASTERY), ARMOR_ARCANE(1 , 1, ARMOR_MASTERY, ARCANE_MASTERY),
+	ARMOR_AGILITY(1, 1, ARMOR_MASTERY, AGILITY_MASTERY), ARMOR_CRAFT(1, 1, ARMOR_MASTERY, CRAFT_MASTERY),
+	ARMOR_ELEMENTS(1, 1, ARMOR_MASTERY, ELEMENTAL_MASTERY),
+	WEAPON_ARCANE(1, 1, WEAPON_MASTERY, ARCANE_MASTERY), WEAPON_AGILITY(1, 1, WEAPON_MASTERY, AGILITY_MASTERY),
+	WEAPON_CRAFT(1, 1, WEAPON_MASTERY, CRAFT_MASTERY), WEAPON_ELEMENTS(1, 1, WEAPON_MASTERY, ELEMENTAL_MASTERY),
+	ARCANE_AGILITY(1, 1, ARCANE_MASTERY, AGILITY_MASTERY), ARCANE_CRAFT(1, 1, ARCANE_MASTERY, CRAFT_MASTERY),
+	ARCANE_ELEMENTS(1, 1, ARCANE_MASTERY, ELEMENTAL_MASTERY),
+	AGILITY_CRAFT(1, 1, AGILITY_MASTERY, CRAFT_MASTERY), AGILITY_ELEMENTS(1, 1, AGILITY_MASTERY, ELEMENTAL_MASTERY),
+	CRAFT_ELEMENTS(1, 1, CRAFT_MASTERY, ELEMENTAL_MASTERY);
+
 
 	public static class ImprovisedProjectileCooldown extends FlavourBuff{};
 	public static class LethalMomentumTracker extends FlavourBuff{};
@@ -121,6 +137,8 @@ public enum Talent {
 
 	int icon;
 	int maxPoints;
+	Talent requirementOne;
+	Talent requirementTwo;
 
 	// tiers 1/2/3/4 start at levels 2/7/13/21
 	public static int[] tierLevelThresholds = new int[]{0, 2, 7, 13, 21, 31};
@@ -134,12 +152,33 @@ public enum Talent {
 		this.maxPoints = maxPoints;
 	}
 
+	Talent( int icon, int maxPoints, Talent requirementOne){
+		this.icon = icon;
+		this.maxPoints = maxPoints;
+		this.requirementOne = requirementOne;
+	}
+
+	Talent( int icon, int maxPoints, Talent requirementOne, Talent requirementTwo ){
+		this.icon = icon;
+		this.maxPoints = maxPoints;
+		this.requirementOne = requirementOne;
+		this.requirementTwo = requirementTwo;
+	}
+
 	public int icon(){
 		return icon;
 	}
 
 	public int maxPoints(){
 		return maxPoints;
+	}
+
+	public Talent requirementOne(){
+		return requirementOne;
+	}
+
+	public Talent requirementTwo(){
+		return requirementTwo;
 	}
 
 	public String title(){
@@ -400,6 +439,9 @@ public enum Talent {
 			case HUNTRESS:
 				Collections.addAll(tierTalents, NATURES_BOUNTY, SURVIVALISTS_INTUITION, FOLLOWUP_STRIKE, NATURES_AID);
 				break;
+			case ADVENTURER:
+				Collections.addAll(tierTalents, ARMOR_MASTERY, WEAPON_MASTERY, ARCANE_MASTERY, AGILITY_MASTERY, CRAFT_MASTERY, ELEMENTAL_MASTERY);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			talents.get(0).put(talent, 0);
@@ -419,6 +461,26 @@ public enum Talent {
 				break;
 			case HUNTRESS:
 				Collections.addAll(tierTalents, INVIGORATING_MEAL, RESTORED_NATURE, REJUVENATING_STEPS, HEIGHTENED_SENSES, DURABLE_PROJECTILES);
+				break;
+			case ADVENTURER:
+				/*Talent[] tierTwoTalents = {ARMOR_WEAPON, ARMOR_ARCANE,
+						ARMOR_AGILITY, ARMOR_CRAFT,
+						ARMOR_ELEMENTS,
+						WEAPON_ARCANE, WEAPON_AGILITY,
+						WEAPON_CRAFT, WEAPON_ELEMENTS,
+						ARCANE_AGILITY, ARCANE_CRAFT,
+						ARCANE_ELEMENTS,
+						AGILITY_CRAFT, AGILITY_ELEMENTS,
+						CRAFT_ELEMENTS};
+
+				for(Talent t : tierTwoTalents){
+					if(t.requirementOne != null && Dungeon.hero.hasTalent(t.requirementOne) && t.requirementTwo != null && Dungeon.hero.hasTalent(t.requirementTwo))
+						Collections.addAll(tierTalents, t);
+				}*/
+				//technically all of them are available, but only some of them are visible at the time
+				Collections.addAll(tierTalents, ARMOR_WEAPON, ARMOR_ARCANE, ARMOR_AGILITY, ARMOR_CRAFT, ARMOR_ELEMENTS,
+												WEAPON_ARCANE, WEAPON_AGILITY, WEAPON_CRAFT, WEAPON_ELEMENTS, ARCANE_AGILITY,
+												ARCANE_CRAFT, ARCANE_ELEMENTS, AGILITY_CRAFT, AGILITY_ELEMENTS, CRAFT_ELEMENTS);
 				break;
 		}
 		for (Talent talent : tierTalents){
@@ -448,6 +510,7 @@ public enum Talent {
 
 		//tier4
 		//TBD
+		//not anymore lmaoooooooooooooooooooooo -b4cku
 	}
 
 	public static void initSubclassTalents( Hero hero ){
