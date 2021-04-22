@@ -488,6 +488,7 @@ public enum Talent {
 			case HUNTRESS:
 				Collections.addAll(tierTalents, POINT_BLANK, SEER_SHOT);
 				break;
+			case ADVENTURER: break;
 		}
 		for (Talent talent : tierTalents){
 			talents.get(2).put(talent, 0);

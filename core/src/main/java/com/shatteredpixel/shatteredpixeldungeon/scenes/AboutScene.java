@@ -55,6 +55,18 @@ public class AboutScene extends PixelScene {
 		Component content = list.content();
 		content.clear();
 
+		//*** Clockwork Pixel Dungeon Credits ***
+
+		final int BCKU_COLOR = 0xFFB855;
+		CreditsBlock cpdx = new CreditsBlock(true, BCKU_COLOR,
+				"Clockwork Pixel Dungeon",
+				Icons.SHPX.get(),
+				"Developed by: _B4CKU_\nBased on Shattered Pixel Dungeon's open source",
+				null,
+				null);
+		cpdx.setRect((Camera.main.width - colWidth)/2f, 6, colWidth, 0);
+		content.add(cpdx);
+
 		//*** Shattered Pixel Dungeon Credits ***
 
 		String shpxLink = "https://ShatteredPixel.com";
@@ -69,7 +81,7 @@ public class AboutScene extends PixelScene {
 				"Developed by: _Evan Debenham_\nBased on Pixel Dungeon's open source",
 				"ShatteredPixel.com",
 				shpxLink);
-		shpx.setRect((w - fullWidth)/2f, 6, 120, 0);
+		shpx.setRect((w - fullWidth)/2f, cpdx.bottom() + 8, colWidth, 0);
 		content.add(shpx);
 
 		CreditsBlock alex = new CreditsBlock(false, Window.SHPX_COLOR,
@@ -94,6 +106,8 @@ public class AboutScene extends PixelScene {
 				"https://s9menine.itch.io");
 		charlie.setRect(alex.right(), alex.top(), colWidth/2f, 0);
 		content.add(charlie);
+
+		addLine(shpx.top() - 4, content);
 
 		//*** Pixel Dungeon Credits ***
 
@@ -175,21 +189,26 @@ public class AboutScene extends PixelScene {
 		purigro.setRect(arcnor.right()+2, arcnor.top(), colWidth/2f, 0);
 		content.add(purigro);
 
-		//*** Transifex Credits ***
+		//*** Special Thanks ***
 
-		CreditsBlock transifex = new CreditsBlock(true,
+		CreditsBlock thanks = new CreditsBlock(true,
 				Window.TITLE_COLOR,
 				null,
 				null,
-				"ShatteredPD is community-translated via _Transifex_! Thank you so much to all of Shattered's volunteer translators!",
-				"www.transifex.com/shattered-pixel/",
-				"https://www.transifex.com/shattered-pixel/shattered-pixel-dungeon/");
-		transifex.setRect((Camera.main.width - colWidth)/2f, purigro.bottom() + 8, colWidth, 0);
-		content.add(transifex);
+				"_ClockworkPD_ is a project that became a reality only thanks to these wonderful folks below! Thank you so much to all of you!\n\n" +
+						"My wonderful girlfriend, _RaveeQuoth,_\n" +
+						"_Quartofel,_\n" +
+						"_484Palkia,_\n" +
+						"_Trashbox Bobylev,_\n" +
+						"and other members of _Pixel Dungeon Discord!_",
+				null,
+				null);
+		thanks.setRect((Camera.main.width - colWidth)/2f, purigro.bottom() + 8, colWidth, 0);
+		content.add(thanks);
 
-		addLine(transifex.top() - 4, content);
+		addLine(thanks.top() - 4, content);
 
-		addLine(transifex.bottom() + 4, content);
+		addLine(thanks.bottom() + 4, content);
 
 		//*** Freesound Credits ***
 
@@ -197,7 +216,7 @@ public class AboutScene extends PixelScene {
 				Window.TITLE_COLOR,
 				null,
 				null,
-				"Shattered Pixel Dungeon uses the following sound samples from _freesound.org_:\n\n" +
+				"Clockwork Pixel Dungeon uses the following sound samples from _freesound.org_:\n\n" +
 
 				"Creative Commons Attribution License:\n" +
 				"_SFX ATTACK SWORD 001.wav_ by _JoelAudio_\n" +
@@ -221,7 +240,7 @@ public class AboutScene extends PixelScene {
 				"_Lemon,Squeeze,Squishy,Fruit.wav_ by _Filipe Chagas_",
 				"www.freesound.org",
 				"https://www.freesound.org");
-		freesound.setRect(transifex.left()-10, transifex.bottom() + 8, colWidth+20, 0);
+		freesound.setRect(thanks.left()-10, thanks.bottom() + 8, colWidth+20, 0);
 		content.add(freesound);
 
 		content.setSize( fullWidth, freesound.bottom()+10 );
