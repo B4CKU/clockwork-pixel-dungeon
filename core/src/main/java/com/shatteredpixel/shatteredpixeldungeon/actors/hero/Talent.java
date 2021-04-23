@@ -481,6 +481,12 @@ public enum Talent {
 			else if (enemy.buff(ArmorDamage.ArmorBreak.class) == null) Buff.affect( enemy, ArmorDamage.class, ArmorDamage.DURATION/2f );
 		}
 
+		if (hero.hasTalent(Talent.ARCANE_MASTERY) && (hero.belongings.weapon instanceof MeleeWeapon)) {
+			for (Wand.Charger c : hero.buffs(Wand.Charger.class)){
+				c.gainCharge(0.25f);
+			}
+		}
+
 		return dmg;
 	}
 

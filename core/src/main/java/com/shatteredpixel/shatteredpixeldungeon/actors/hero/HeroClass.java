@@ -203,6 +203,7 @@ public enum HeroClass {
 		stones.quantity(3).collect();
 		Dungeon.quickslot.setSlot(0, stones);
 
+		//TODO remove debug stuff below
 		PotionOfExperience potion = new PotionOfExperience();
 		potion.quantity(30).collect();
 
