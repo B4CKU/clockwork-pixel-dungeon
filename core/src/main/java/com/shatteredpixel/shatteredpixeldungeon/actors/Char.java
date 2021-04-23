@@ -322,7 +322,7 @@ public abstract class Char extends Actor {
 
 			if ( buff(SteadyAim.class ) != null) {
 				dr = (int)Math.floor(dr * 0.5f);
-				dmg = (int)Math.floor(dmg * 1.15f);
+				dmg = (int)Math.floor(dmg * 1.5f);
 				Buff.detach(this, SteadyAim.class);
 				Buff.affect(this, Talent.SteadyAimCooldown.class, 20f);
 			}
