@@ -358,6 +358,12 @@ public abstract class Wand extends Item {
 				GLog.p( Messages.get(Wand.class, "identify") );
 				Badges.validateItemLevelAquired( this );
 			}
+			if (usesLeftToID <= 0 || Dungeon.hero.hasTalent(Talent.ARCANE_MASTERY)) {
+				identify();
+				GLog.p( Messages.get(Wand.class, "identify") );
+				Badges.validateItemLevelAquired( this );
+			}
+
 		}
 		
 		curCharges -= cursed ? 1 : chargesPerCast();

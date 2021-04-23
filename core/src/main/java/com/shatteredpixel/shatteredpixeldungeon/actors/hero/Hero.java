@@ -321,12 +321,12 @@ public class Hero extends Char {
 
 	public int talentPointsAvailable(int tier){
 		if (lvl < Talent.tierLevelThresholds[tier]
-			|| (tier == 3 && subClass == HeroSubClass.NONE)){
+			|| (heroClass != HeroClass.ADVENTURER && (tier == 3 && subClass == HeroSubClass.NONE))){
 			return 0;
 		} else if (lvl >= Talent.tierLevelThresholds[tier+1]){
-			return Talent.tierLevelThresholds[tier+1] - Talent.tierLevelThresholds[tier] - talentPointsSpent(tier);
+			return (int)Math.ceil((Talent.tierLevelThresholds[tier+1] - Talent.tierLevelThresholds[tier])/2f) - talentPointsSpent(tier);
 		} else {
-			return 1 + lvl - Talent.tierLevelThresholds[tier] - talentPointsSpent(tier);
+			return (int)Math.ceil((1 + lvl - Talent.tierLevelThresholds[tier])/2f) - talentPointsSpent(tier);
 		}
 	}
 	
@@ -1483,7 +1483,7 @@ public class Hero extends Char {
 				GLog.p( Messages.get(this, "new_level") );
 				sprite.showStatus( CharSprite.POSITIVE, Messages.get(Hero.class, "level_up") );
 				Sample.INSTANCE.play( Assets.Sounds.LEVELUP );
-				if (lvl < Talent.tierLevelThresholds[Talent.MAX_TALENT_TIERS+1]){
+				if (lvl < Talent.tierLevelThresholds[Talent.MAX_TALENT_TIERS+1] && lvl%2==0){
 					GLog.newLine();
 					GLog.p( Messages.get(this, "new_talent") );
 					StatusPane.talentBlink = 10f;
@@ -1492,7 +1492,9 @@ public class Hero extends Char {
 			}
 			
 			Item.updateQuickslot();
-			
+
+			Talent.onLevelUp(this);
+
 			Badges.validateLevelReached();
 		}
 	}

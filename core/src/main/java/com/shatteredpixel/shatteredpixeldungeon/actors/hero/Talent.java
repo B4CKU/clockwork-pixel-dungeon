@@ -44,7 +44,9 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HornOfPlenty;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRecharging;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
@@ -55,11 +57,13 @@ import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.noosa.particles.Emitter;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
+import com.watabou.utils.Reflection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -140,8 +144,8 @@ public enum Talent {
 	Talent requirementOne;
 	Talent requirementTwo;
 
-	// tiers 1/2/3/4 start at levels 2/7/13/21
-	public static int[] tierLevelThresholds = new int[]{0, 2, 7, 13, 21, 31};
+	// tiers 1/2/3/4 start at levels 2/8/16/30
+	public static int[] tierLevelThresholds = new int[]{0, 2, 8, 16, 30, 31};
 
 	Talent( int icon ){
 		this(icon, 2);
@@ -190,36 +194,84 @@ public enum Talent {
 	}
 
 	public static void onTalentUpgraded( Hero hero, Talent talent){
-		if (talent == NATURES_BOUNTY){
-			if ( hero.pointsInTalent(NATURES_BOUNTY) == 1) Buff.count(hero, NatureBerriesAvailable.class, 4);
-			else                                           Buff.count(hero, NatureBerriesAvailable.class, 2);
-		}
-
-		if (talent == ARMSMASTERS_INTUITION && hero.pointsInTalent(ARMSMASTERS_INTUITION) == 2){
-			if (hero.belongings.weapon != null) hero.belongings.weapon.identify();
-			if (hero.belongings.armor != null)  hero.belongings.armor.identify();
-		}
-		if (talent == THIEFS_INTUITION && hero.pointsInTalent(THIEFS_INTUITION) == 2){
-			if (hero.belongings.ring instanceof Ring) hero.belongings.ring.identify();
-			if (hero.belongings.misc instanceof Ring) hero.belongings.misc.identify();
-			for (Item item : Dungeon.hero.belongings){
-				if (item instanceof Ring){
-					((Ring) item).setKnown();
+		int points = hero.pointsInTalent(talent);
+		switch(talent) {
+			case NATURES_BOUNTY:
+				if (points == 1) Buff.count(hero, NatureBerriesAvailable.class, 4);
+				else                                           Buff.count(hero, NatureBerriesAvailable.class, 2);
+				break;
+			case ARMSMASTERS_INTUITION:
+				if (points == 2) {
+					if (hero.belongings.weapon != null) hero.belongings.weapon.identify();
+					if (hero.belongings.armor != null)  hero.belongings.armor.identify();
 				}
-			}
-		}
-		if (talent == THIEFS_INTUITION && hero.pointsInTalent(THIEFS_INTUITION) == 1){
-			if (hero.belongings.ring instanceof Ring) hero.belongings.ring.setKnown();
-			if (hero.belongings.misc instanceof Ring) ((Ring) hero.belongings.misc).setKnown();
+				break;
+			case THIEFS_INTUITION:
+				if (points == 1) {
+					if (hero.belongings.ring instanceof Ring) hero.belongings.ring.setKnown();
+					if (hero.belongings.misc instanceof Ring) ((Ring) hero.belongings.misc).setKnown();
+				} else if (points == 2) {
+					if (hero.belongings.ring instanceof Ring) hero.belongings.ring.identify();
+					if (hero.belongings.misc instanceof Ring) hero.belongings.misc.identify();
+					for (Item item : Dungeon.hero.belongings){
+						if (item instanceof Ring){
+							((Ring) item).setKnown();
+						}
+					}
+				}
+				break;
+			case FARSIGHT:
+				Dungeon.observe();
+				break;
+			case WEAPON_MASTERY:
+				if (hero.belongings.weapon != null) hero.belongings.weapon.identify();
+				break;
+			case ARMOR_MASTERY:
+				if (hero.belongings.armor != null)  hero.belongings.armor.identify();
+				break;
+			case AGILITY_MASTERY:
+				if (hero.belongings.ring instanceof Ring) hero.belongings.ring.identify();
+				if (hero.belongings.misc instanceof Ring) hero.belongings.misc.identify();
+				break;
+			case CRAFT_MASTERY:
+				if (!(Scroll.getUnknown().isEmpty())) {
+					Scroll s = Reflection.newInstance(Random.element(Scroll.getUnknown()));
+					s.identify();
+					GLog.p( Messages.get(Hero.class, "identify", s) );
+				}
+				break;
+			case ELEMENTAL_MASTERY:
+				if (!(Potion.getUnknown().isEmpty())) {
+					Potion p = Reflection.newInstance(Random.element(Potion.getUnknown()));
+					p.identify();
+					GLog.p( Messages.get(Hero.class, "identify", p) );
+				}
+				break;
 		}
 
-		if (talent == FARSIGHT){
-			Dungeon.observe();
-		}
+
 	}
 
 	public static class CachedRationsDropped extends CounterBuff{};
 	public static class NatureBerriesAvailable extends CounterBuff{};
+
+	public static void onLevelUp( Hero hero ){
+		if (hero.hasTalent(CRAFT_MASTERY)){
+			if (!(Scroll.getUnknown().isEmpty())) {
+				Scroll s = Reflection.newInstance(Random.element(Scroll.getUnknown()));
+				s.identify();
+				GLog.p( Messages.get(Hero.class, "identify", s) );
+			}
+		}
+		if (hero.hasTalent(ELEMENTAL_MASTERY)){
+			if (!(Potion.getUnknown().isEmpty())) {
+				Potion p = Reflection.newInstance(Random.element(Potion.getUnknown()));
+				p.identify();
+				GLog.p( Messages.get(Hero.class, "identify", p) );
+			}
+		}
+
+	}
 
 	public static void onFoodEaten( Hero hero, float foodVal, Item foodSource ){
 		if (hero.hasTalent(HEARTY_MEAL)){
@@ -275,7 +327,7 @@ public enum Talent {
 		if (item instanceof Wand){
 			factor *= 1f + 2*hero.pointsInTalent(SCHOLARS_INTUITION);
 		}
-		// 2x/instant for rogue (see onItemEqupped), also id's type on equip/on pickup
+		// 2x/instant for rogue (see onItemEquipped), also id's type on equip/on pickup
 		if (item instanceof Ring){
 			factor *= 1f + hero.pointsInTalent(THIEFS_INTUITION);
 		}
@@ -362,6 +414,15 @@ public enum Talent {
 			} else {
 				((Ring) item).setKnown();
 			}
+		}
+		if (hero.hasTalent(WEAPON_MASTERY) && (item instanceof Weapon)){
+			item.identify();
+		}
+		if (hero.hasTalent(ARMOR_MASTERY) && (item instanceof Armor)){
+			item.identify();
+		}
+		if (hero.hasTalent(AGILITY_MASTERY) && (item instanceof Ring)){
+			item.identify();
 		}
 	}
 

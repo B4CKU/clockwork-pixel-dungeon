@@ -59,9 +59,6 @@ public class TalentsPane extends ScrollPane {
 					&& Dungeon.hero.lvl+1 >= Talent.tierLevelThresholds[tiersAvailable+1]){
 				tiersAvailable++;
 			}
-			if (tiersAvailable > 2 && Dungeon.hero.subClass == HeroSubClass.NONE){
-				tiersAvailable = 2;
-			}
 		}
 
 		tiersAvailable = Math.min(tiersAvailable, talents.size());
@@ -175,7 +172,7 @@ public class TalentsPane extends ScrollPane {
 				stars.clear();
 			}
 
-			int totStars = Talent.tierLevelThresholds[tier+1] - Talent.tierLevelThresholds[tier];
+			int totStars = (int)Math.ceil((Talent.tierLevelThresholds[tier+1] - Talent.tierLevelThresholds[tier])/2f);
 			int openStars = Dungeon.hero.talentPointsAvailable(tier);
 			int usedStars = Dungeon.hero.talentPointsSpent(tier);
 			for (int i = 0; i < totStars; i++){

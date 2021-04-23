@@ -90,7 +90,7 @@ public class WandOfMagicMissile extends DamageWand {
 	}
 	
 	protected int initialCharges() {
-		return 3;
+		return super.initialCharges()+1;
 	}
 
 	public static class MagicCharge extends FlavourBuff {

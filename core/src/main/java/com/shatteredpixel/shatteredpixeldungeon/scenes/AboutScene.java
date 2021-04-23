@@ -198,6 +198,8 @@ public class AboutScene extends PixelScene {
 				"_ClockworkPD_ is a project that became a reality only thanks to these wonderful folks below! Thank you so much to all of you!\n\n" +
 						"My wonderful girlfriend, _RaveeQuoth,_\n" +
 						"_Quartofel,_\n" +
+						"_MitiGames,_\n" +
+						"_NeoSlav,_\n" +
 						"_484Palkia,_\n" +
 						"_Trashbox Bobylev,_\n" +
 						"and other members of _Pixel Dungeon Discord!_",

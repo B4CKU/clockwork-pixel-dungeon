@@ -78,7 +78,7 @@ public class HeroSelectScene extends PixelScene {
 		Badges.loadGlobal();
 		Journal.loadGlobal();
 
-		background = new Image(HeroClass.WARRIOR.splashArt()){
+		background = new Image(HeroClass.ROGUE.splashArt()){
 			@Override
 			public void update() {
 				if (rm > 1f){
@@ -152,23 +152,19 @@ public class HeroSelectScene extends PixelScene {
 		infoButton.setSize(21, 21);
 		add(infoButton);
 
-		HeroClass[] classes = HeroClass.values();
-
 		int btnWidth = HeroBtn.MIN_WIDTH;
-		int curX = (Camera.main.width - btnWidth * classes.length)/2;
+		int curX = (Camera.main.width - btnWidth)/2;
 		if (curX > 0){
-			btnWidth += Math.min(curX/(classes.length/2), 15);
-			curX = (Camera.main.width - btnWidth * classes.length)/2;
+			btnWidth += Math.min(curX*2, 15);
+			curX = (Camera.main.width - btnWidth)/2;
 		}
-
 		int heroBtnleft = curX;
-		for (HeroClass cl : classes){
-			HeroBtn button = new HeroBtn(cl);
-			button.setRect(curX, Camera.main.height-HeroBtn.HEIGHT+3, btnWidth, HeroBtn.HEIGHT);
-			curX += btnWidth;
-			add(button);
-			heroBtns.add(button);
-		}
+
+		HeroBtn button = new HeroBtn(HeroClass.ADVENTURER);
+		button.setRect(curX, Camera.main.height-HeroBtn.HEIGHT+3, btnWidth, HeroBtn.HEIGHT);
+		curX += btnWidth;
+		add(button);
+		heroBtns.add(button);
 
 		challengeButton = new IconButton(
 				Icons.get( SPDSettings.challenges() > 0 ? Icons.CHALLENGE_ON :Icons.CHALLENGE_OFF)){
