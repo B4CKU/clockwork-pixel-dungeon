@@ -295,15 +295,6 @@ public abstract class Char extends Actor {
 		} else if (hit( this, enemy, false )) {
 			
 			int dr = enemy.drRoll();
-			
-			if (this instanceof Hero){
-				Hero h = (Hero)this;
-				if (h.belongings.weapon instanceof MissileWeapon
-						&& h.subClass == HeroSubClass.SNIPER
-						&& !Dungeon.level.adjacent(h.pos, enemy.pos)){
-					dr = 0;
-				}
-			}
 
 			if ( enemy.buff( ArmorDamage.ArmorBreak.class ) != null){
 				dr = (int)Math.floor(dr * 0.25f);
@@ -320,11 +311,19 @@ public abstract class Char extends Actor {
 				dmg = damageRoll();
 			}
 
-			if ( buff(SteadyAim.class ) != null) {
-				dr = (int)Math.floor(dr * 0.5f);
-				dmg = (int)Math.floor(dmg * 1.5f);
-				Buff.detach(this, SteadyAim.class);
-				Buff.affect(this, Talent.SteadyAimCooldown.class, 20f);
+			if (this instanceof Hero){
+				Hero h = (Hero)this;
+				if (h.belongings.weapon instanceof MissileWeapon){
+					if(h.subClass == HeroSubClass.SNIPER && !Dungeon.level.adjacent(h.pos, enemy.pos)){
+						dr = 0;
+					}
+					if ( buff(SteadyAim.class ) != null) {
+						dr = (int)Math.floor(dr * 0.5f);
+						dmg = (int)Math.floor(dmg * 1.5f);
+						Buff.detach(this, SteadyAim.class);
+						Buff.affect(this, Talent.SteadyAimCooldown.class, 20f);
+					}
+				}
 			}
 
 			int effectiveDamage = enemy.defenseProc( this, dmg );
