@@ -435,6 +435,16 @@ public abstract class RegularLevel extends Level {
 			}
 		}
 
+		//craft mastery drops additional consumable every level
+		if (Dungeon.hero.hasTalent(Talent.CRAFT_MASTERY)){
+			if (Random.Int(1) == 0)
+				item = Generator.random(Generator.Category.SCROLL);
+			else
+				item = Generator.random(Generator.Category.POTION);
+			int cell = randomDropCell();
+			drop( item, cell ).type = Heap.Type.HEAP;
+		}
+
 		//guide pages
 		Collection<String> allPages = Document.ADVENTURERS_GUIDE.pages();
 		ArrayList<String> missingPages = new ArrayList<>();
