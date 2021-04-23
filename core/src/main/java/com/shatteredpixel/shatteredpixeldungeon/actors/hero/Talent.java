@@ -31,6 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.KnightShield;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Recharging;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.WandEmpower;
@@ -228,6 +229,7 @@ public enum Talent {
 				break;
 			case ARMOR_MASTERY:
 				if (hero.belongings.armor != null)  hero.belongings.armor.identify();
+				Buff.affect(hero, KnightShield.class);
 				break;
 			case AGILITY_MASTERY:
 				if (hero.belongings.ring instanceof Ring) hero.belongings.ring.identify();
