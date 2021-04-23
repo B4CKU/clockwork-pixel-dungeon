@@ -86,7 +86,8 @@ public class TalentsPane extends ScrollPane {
 		} else if (tiersAvailable == 2) {
 			blockText = PixelScene.renderTextBlock(Messages.get(this, "unlock_tier3"), 6);
 		} else {
-			blockText = PixelScene.renderTextBlock(Messages.get(this, "coming_soon"), 6);
+			// TODO: fix that quick workaround below
+			blockText = PixelScene.renderTextBlock(" ", 6);
 		}
 		content.add(blockText);
 	}

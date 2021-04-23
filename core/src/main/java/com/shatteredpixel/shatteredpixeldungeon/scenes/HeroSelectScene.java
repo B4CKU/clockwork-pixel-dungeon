@@ -330,8 +330,9 @@ public class HeroSelectScene extends PixelScene {
 		private RenderedTextBlock info;
 
 		private TalentsPane talents;
+		/*
 		private RedButton firstSub;
-		private RedButton secondSub;
+		private RedButton secondSub;*/
 
 		private int WIDTH = 120;
 		private int HEIGHT = 120;
@@ -351,11 +352,11 @@ public class HeroSelectScene extends PixelScene {
 
 			ArrayList<LinkedHashMap<Talent, Integer>> talentList = new ArrayList<>();
 			Talent.initClassTalents(cl, talentList);
-			Talent.initSubclassTalents(cl.subClasses()[secondSubclass ? 1 : 0], talentList);
+			//Talent.initSubclassTalents(cl.subClasses()[secondSubclass ? 1 : 0], talentList);
 			talents = new TalentsPane(false, talentList);
 			add(talents);
 
-			firstSub = new RedButton(Messages.titleCase(cl.subClasses()[0].title()), 7){
+			/*firstSub = new RedButton(Messages.titleCase(cl.subClasses()[0].title()), 7){
 				@Override
 				protected void onClick() {
 					super.onClick();
@@ -389,7 +390,7 @@ public class HeroSelectScene extends PixelScene {
 			};
 			if (secondSubclass) secondSub.textColor(Window.TITLE_COLOR);
 			secondSub.setSize(40, secondSub.reqHeight()+2);
-			add(secondSub);
+			add(secondSub);*/
 
 			Tab tab;
 			Image[] tabIcons;
@@ -420,7 +421,7 @@ public class HeroSelectScene extends PixelScene {
 					break;
 				case ADVENTURER:
 					tabIcons = new Image[]{
-							Icons.get(Icons.TALENT),
+							new ItemSprite(ItemSpriteSheet.THROWING_STONE, null),
 							new ItemSprite(ItemSpriteSheet.WORN_SHORTSWORD, null)
 					};
 					break;
@@ -459,13 +460,13 @@ public class HeroSelectScene extends PixelScene {
 						info.text(Messages.get(WndHeroInfo.class, "talents_desc"), INFO_WIDTH);
 					}
 					talents.visible = talents.active = value;
-					firstSub.visible = firstSub.active = value;
-					secondSub.visible = secondSub.active = value;
+					/*firstSub.visible = firstSub.active = value;
+					secondSub.visible = secondSub.active = value;*/
 				}
 			};
 			add(tab);
 
-			tab = new IconTab(new ItemSprite(ItemSpriteSheet.MASTERY, null)){
+			/*tab = new IconTab(new ItemSprite(ItemSpriteSheet.MASTERY, null)){
 				@Override
 				protected void select(boolean value) {
 					super.select(value);
@@ -479,7 +480,7 @@ public class HeroSelectScene extends PixelScene {
 					}
 				}
 			};
-			add(tab);
+			add(tab);*/
 
 			resize(WIDTH, HEIGHT);
 			select(0);
@@ -493,8 +494,8 @@ public class HeroSelectScene extends PixelScene {
 			title.setPos((WIDTH-title.width())/2, MARGIN);
 			info.setPos(MARGIN, title.bottom()+2*MARGIN);
 
-			firstSub.setPos((title.left() - firstSub.width())/2, 0);
-			secondSub.setPos(title.right() + (WIDTH - title.right() - secondSub.width())/2, 0);
+			/*firstSub.setPos((title.left() - firstSub.width())/2, 0);
+			secondSub.setPos(title.right() + (WIDTH - title.right() - secondSub.width())/2, 0);*/
 
 			talents.setRect(0, info.bottom()+MARGIN, WIDTH, HEIGHT - (info.bottom()+MARGIN));
 
