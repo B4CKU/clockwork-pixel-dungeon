@@ -56,6 +56,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Slow;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.SnipersMark;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Speed;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Stamina;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.SteadyAim;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Terror;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vertigo;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vulnerable;
@@ -305,7 +306,7 @@ public abstract class Char extends Actor {
 			}
 
 			if ( enemy.buff( ArmorDamage.ArmorBreak.class ) != null){
-				dr = (int)Math.floor(dr * 0.33f);
+				dr = (int)Math.floor(dr * 0.25f);
 			}
 
 			int dmg;
@@ -318,7 +319,14 @@ public abstract class Char extends Actor {
 			} else {
 				dmg = damageRoll();
 			}
-			
+
+			if ( buff(SteadyAim.class ) != null) {
+				dr = (int)Math.floor(dr * 0.5f);
+				dmg = (int)Math.floor(dmg * 1.15f);
+				Buff.detach(this, SteadyAim.class);
+				Buff.affect(this, Talent.SteadyAimCooldown.class, 20f);
+			}
+
 			int effectiveDamage = enemy.defenseProc( this, dmg );
 			effectiveDamage = Math.max( effectiveDamage - dr, 0 );
 			

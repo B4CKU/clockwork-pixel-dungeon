@@ -141,6 +141,7 @@ public enum Talent {
 	public static class BountyHunterTracker extends FlavourBuff{};
 	public static class RejuvenatingStepsCooldown extends FlavourBuff{};
 	public static class SeerShotCooldown extends FlavourBuff{};
+	public static class SteadyAimCooldown extends FlavourBuff{};
 
 	int icon;
 	int maxPoints;

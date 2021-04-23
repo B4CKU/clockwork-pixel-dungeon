@@ -51,6 +51,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Momentum;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Regeneration;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.SnipersMark;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.SteadyAim;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vertigo;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Monk;
@@ -1070,6 +1071,9 @@ public class Hero extends Char {
 		if (!fullRest) {
 			if (hasTalent(Talent.HOLD_FAST)){
 				Buff.affect(this, HoldFast.class);
+			}
+			if (hasTalent(Talent.AGILITY_MASTERY) && buff(Talent.SteadyAimCooldown.class ) == null){
+				Buff.affect(this, SteadyAim.class);
 			}
 			if (sprite != null) {
 				sprite.showStatus(CharSprite.DEFAULT, Messages.get(this, "wait"));
