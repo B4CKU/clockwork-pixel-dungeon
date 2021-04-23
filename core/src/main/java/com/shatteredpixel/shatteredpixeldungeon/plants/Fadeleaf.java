@@ -50,28 +50,8 @@ public class Fadeleaf extends Plant {
 		if (ch instanceof Hero) {
 			
 			((Hero)ch).curAction = null;
-			
-			if (((Hero) ch).subClass == HeroSubClass.WARDEN){
-				
-				if (Dungeon.bossLevel()) {
-					GLog.w( Messages.get(ScrollOfTeleportation.class, "no_tele") );
-					return;
-					
-				}
-				
-				Buff buff = Dungeon.hero.buff(TimekeepersHourglass.timeFreeze.class);
-				if (buff != null) buff.detach();
-				buff = Dungeon.hero.buff(Swiftthistle.TimeBubble.class);
-				if (buff != null) buff.detach();
-				
-				InterlevelScene.mode = InterlevelScene.Mode.RETURN;
-				InterlevelScene.returnDepth = Math.max(1, (Dungeon.depth - 1));
-				InterlevelScene.returnPos = -2;
-				Game.switchScene( InterlevelScene.class );
-				
-			} else {
-				ScrollOfTeleportation.teleportHero((Hero) ch);
-			}
+
+			ScrollOfTeleportation.teleportHero((Hero) ch);
 			
 		} else if (ch instanceof Mob && !ch.properties().contains(Char.Property.IMMOVABLE)) {
 
@@ -99,6 +79,29 @@ public class Fadeleaf extends Plant {
 
 		}
 		
+		if (Dungeon.level.heroFOV[pos]) {
+			CellEmitter.get( pos ).start( Speck.factory( Speck.LIGHT ), 0.2f, 3 );
+		}
+	}
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		if (Dungeon.bossLevel()) {
+			GLog.w( Messages.get(ScrollOfTeleportation.class, "no_tele") );
+			return;
+
+		}
+
+		Buff buff = Dungeon.hero.buff(TimekeepersHourglass.timeFreeze.class);
+		if (buff != null) buff.detach();
+		buff = Dungeon.hero.buff(Swiftthistle.TimeBubble.class);
+		if (buff != null) buff.detach();
+
+		InterlevelScene.mode = InterlevelScene.Mode.RETURN;
+		InterlevelScene.returnDepth = Math.max(1, (Dungeon.depth - 1));
+		InterlevelScene.returnPos = -2;
+		Game.switchScene( InterlevelScene.class );
+
 		if (Dungeon.level.heroFOV[pos]) {
 			CellEmitter.get( pos ).start( Speck.factory( Speck.LIGHT ), 0.2f, 3 );
 		}

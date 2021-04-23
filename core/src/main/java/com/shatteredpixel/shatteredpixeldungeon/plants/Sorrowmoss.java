@@ -41,14 +41,19 @@ public class Sorrowmoss extends Plant {
 	
 	@Override
 	public void activate( Char ch ) {
-		if (ch instanceof Hero && ((Hero) ch).subClass == HeroSubClass.WARDEN){
-			Buff.affect(ch, ToxicImbue.class).set(ToxicImbue.DURATION*0.3f);
-		}
-		
 		if (ch != null) {
 			Buff.affect( ch, Poison.class ).set( 5 + Math.round(2*Dungeon.depth / 3f) );
 		}
 		
+		if (Dungeon.level.heroFOV[pos]) {
+			CellEmitter.center( pos ).burst( PoisonParticle.SPLASH, 3 );
+		}
+	}
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		Buff.affect(ch, ToxicImbue.class).set(ToxicImbue.DURATION*0.3f);
+
 		if (Dungeon.level.heroFOV[pos]) {
 			CellEmitter.center( pos ).burst( PoisonParticle.SPLASH, 3 );
 		}

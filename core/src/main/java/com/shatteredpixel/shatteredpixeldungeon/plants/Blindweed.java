@@ -45,18 +45,22 @@ public class Blindweed extends Plant {
 	public void activate( Char ch ) {
 		
 		if (ch != null) {
-			if (ch instanceof Hero && ((Hero) ch).subClass == HeroSubClass.WARDEN){
-				Buff.affect(ch, Invisibility.class, Invisibility.DURATION/2f);
-			} else {
-				Buff.prolong(ch, Blindness.class, Blindness.DURATION);
-				Buff.prolong(ch, Cripple.class, Cripple.DURATION);
-				if (ch instanceof Mob) {
-					if (((Mob) ch).state == ((Mob) ch).HUNTING) ((Mob) ch).state = ((Mob) ch).WANDERING;
-					((Mob) ch).beckon(Dungeon.level.randomDestination( ch ));
-				}
+			Buff.prolong(ch, Blindness.class, Blindness.DURATION);
+			Buff.prolong(ch, Cripple.class, Cripple.DURATION);
+			if (ch instanceof Mob) {
+				if (((Mob) ch).state == ((Mob) ch).HUNTING) ((Mob) ch).state = ((Mob) ch).WANDERING;
+				((Mob) ch).beckon(Dungeon.level.randomDestination( ch ));
 			}
 		}
 		
+		if (Dungeon.level.heroFOV[pos]) {
+			CellEmitter.get( pos ).burst( Speck.factory( Speck.LIGHT ), 4 );
+		}
+	}
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		Buff.affect(ch, Invisibility.class, Invisibility.DURATION/2f);
 		if (Dungeon.level.heroFOV[pos]) {
 			CellEmitter.get( pos ).burst( Speck.factory( Speck.LIGHT ), 4 );
 		}

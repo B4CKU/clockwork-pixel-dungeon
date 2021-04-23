@@ -47,10 +47,13 @@ public class Swiftthistle extends Plant {
 	public void activate( Char ch ) {
 		if (ch == Dungeon.hero) {
 			Buff.affect(ch, TimeBubble.class).reset();
-			if (Dungeon.hero.subClass == HeroSubClass.WARDEN){
-				Buff.affect(ch, Haste.class, 1f);
-			}
 		}
+	}
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		this.activate(ch);
+		Buff.affect(ch, Haste.class, 1f);
 	}
 	
 	public static class Seed extends Plant.Seed {

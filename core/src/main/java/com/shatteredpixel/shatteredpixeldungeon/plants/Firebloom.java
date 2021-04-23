@@ -43,18 +43,20 @@ public class Firebloom extends Plant {
 	
 	@Override
 	public void activate( Char ch ) {
-		
-		if (ch instanceof Hero && ((Hero) ch).subClass == HeroSubClass.WARDEN){
-			Buff.affect(ch, FireImbue.class).set( FireImbue.DURATION*0.3f );
-		}
-		
+
 		GameScene.add( Blob.seed( pos, 2, Fire.class ) );
 		
 		if (Dungeon.level.heroFOV[pos]) {
 			CellEmitter.get( pos ).burst( FlameParticle.FACTORY, 5 );
 		}
 	}
-	
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		Buff.affect(ch, FireImbue.class).set( FireImbue.DURATION*0.3f );
+		this.activate(ch);
+	}
+
 	public static class Seed extends Plant.Seed {
 		{
 			image = ItemSpriteSheet.SEED_FIREBLOOM;

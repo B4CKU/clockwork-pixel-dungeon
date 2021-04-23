@@ -67,7 +67,8 @@ public abstract class Plant implements Bundlable {
 		}
 
 		wither();
-		activate( ch );
+		if (ch instanceof Hero && (((Hero) ch).subClass == HeroSubClass.WARDEN || ((Hero) ch).hasTalent(Talent.ELEMENTAL_MASTERY))) advancedActivate(ch);
+		else activate( ch );
 
 		if (Dungeon.level.heroFOV[pos] && Dungeon.hero.hasTalent(Talent.NATURES_AID)){
 			// 3/5 turns based on talent points spent
@@ -76,6 +77,8 @@ public abstract class Plant implements Bundlable {
 	}
 	
 	public abstract void activate( Char ch );
+
+	public abstract void advancedActivate( Char ch );
 	
 	public void wither() {
 		Dungeon.level.uproot( pos );

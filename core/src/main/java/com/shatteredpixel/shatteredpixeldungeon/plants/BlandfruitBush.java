@@ -36,6 +36,11 @@ public class BlandfruitBush extends Plant {
 		Dungeon.level.drop( new Blandfruit(), pos ).sprite.drop();
 	}
 
+	@Override
+	public void advancedActivate( Char ch ) {
+		this.activate(ch);
+	}
+
 	//seed is never dropped
 	public static class Seed extends Plant.Seed {
 		{

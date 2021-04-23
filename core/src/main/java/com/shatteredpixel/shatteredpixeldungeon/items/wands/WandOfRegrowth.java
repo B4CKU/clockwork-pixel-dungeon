@@ -210,6 +210,11 @@ public class WandOfRegrowth extends Wand {
 
 		}
 
+		@Override
+		public void advancedActivate( Char ch ) {
+			this.activate(ch);
+		}
+
 		//seed is never dropped, only care about plant class
 		public static class Seed extends Plant.Seed {
 			{
@@ -244,6 +249,11 @@ public class WandOfRegrowth extends Wand {
 				candidates.remove(c);
 			}
 
+		}
+
+		@Override
+		public void advancedActivate( Char ch ) {
+			this.activate(ch);
 		}
 
 		//seed is never dropped, only care about plant class

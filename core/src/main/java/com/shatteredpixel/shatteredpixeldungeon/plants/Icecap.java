@@ -43,10 +43,6 @@ public class Icecap extends Plant {
 	@Override
 	public void activate( Char ch ) {
 		
-		if (ch instanceof Hero && ((Hero) ch).subClass == HeroSubClass.WARDEN){
-			Buff.affect(ch, FrostImbue.class, FrostImbue.DURATION*0.3f);
-		}
-		
 		PathFinder.buildDistanceMap( pos, BArray.not( Dungeon.level.losBlocking, null ), 1 );
 		
 		Fire fire = (Fire)Dungeon.level.blobs.get( Fire.class );
@@ -56,6 +52,12 @@ public class Icecap extends Plant {
 				Freezing.affect( i, fire );
 			}
 		}
+	}
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		Buff.affect(ch, FrostImbue.class, FrostImbue.DURATION*0.3f);
+		this.activate(ch);
 	}
 	
 	public static class Seed extends Plant.Seed {

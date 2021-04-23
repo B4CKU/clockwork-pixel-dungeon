@@ -46,13 +46,17 @@ public class Sungrass extends Plant {
 	public void activate( Char ch ) {
 		
 		if (ch == Dungeon.hero) {
-			if (Dungeon.hero.subClass == HeroSubClass.WARDEN) {
-				Buff.affect(ch, Healing.class).setHeal(ch.HT, 0, 1);
-			} else {
-				Buff.affect(ch, Health.class).boost(ch.HT);
-			}
+			Buff.affect(ch, Health.class).boost(ch.HT);
 		}
 		
+		if (Dungeon.level.heroFOV[pos]) {
+			CellEmitter.get( pos ).start( ShaftParticle.FACTORY, 0.2f, 3 );
+		}
+	}
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		Buff.affect(ch, Healing.class).setHeal(ch.HT, 0, 1);
 		if (Dungeon.level.heroFOV[pos]) {
 			CellEmitter.get( pos ).start( ShaftParticle.FACTORY, 0.2f, 3 );
 		}

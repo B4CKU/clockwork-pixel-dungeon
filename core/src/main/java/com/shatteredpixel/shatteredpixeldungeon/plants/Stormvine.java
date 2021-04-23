@@ -38,14 +38,14 @@ public class Stormvine extends Plant {
 
 	@Override
 	public void activate( Char ch ) {
-
 		if (ch != null) {
-			if (ch instanceof Hero && ((Hero) ch).subClass == HeroSubClass.WARDEN){
-				Buff.affect(ch, Levitation.class, Levitation.DURATION/2f);
-			} else {
-				Buff.affect(ch, Vertigo.class, Vertigo.DURATION);
-			}
+			Buff.affect(ch, Vertigo.class, Vertigo.DURATION);
 		}
+	}
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		Buff.affect(ch, Levitation.class, Levitation.DURATION/2f);
 	}
 
 	public static class Seed extends Plant.Seed {

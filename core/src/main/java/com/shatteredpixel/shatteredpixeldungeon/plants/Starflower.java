@@ -38,14 +38,16 @@ public class Starflower extends Plant {
 
 	@Override
 	public void activate( Char ch ) {
-
 		if (ch != null) {
 			Buff.prolong(ch, Bless.class, Bless.DURATION);
-			if (ch instanceof Hero && ((Hero) ch).subClass == HeroSubClass.WARDEN){
-				Buff.prolong(ch, Recharging.class, Recharging.DURATION);
-			}
 		}
 
+	}
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		this.activate(ch);
+		Buff.prolong(ch, Recharging.class, Recharging.DURATION);
 	}
 
 	public static class Seed extends Plant.Seed{

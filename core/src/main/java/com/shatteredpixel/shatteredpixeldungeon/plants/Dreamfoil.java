@@ -49,13 +49,14 @@ public class Dreamfoil extends Plant {
 			} else if (ch instanceof Hero){
 				GLog.i( Messages.get(this, "refreshed") );
 				PotionOfHealing.cure(ch);
-				
-				if (((Hero) ch).subClass == HeroSubClass.WARDEN){
-					Buff.affect(ch, BlobImmunity.class, BlobImmunity.DURATION/2f);
-				}
-				
 			}
 		}
+	}
+
+	@Override
+	public void advancedActivate( Char ch ) {
+		this.activate(ch);
+		Buff.affect(ch, BlobImmunity.class, BlobImmunity.DURATION/2f);
 	}
 
 	public static class Seed extends Plant.Seed {
