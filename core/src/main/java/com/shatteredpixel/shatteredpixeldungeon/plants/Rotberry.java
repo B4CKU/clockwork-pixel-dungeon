@@ -45,7 +45,6 @@ public class Rotberry extends Plant {
 
 	@Override
 	public void advancedActivate( Char ch ) {
-		Buff.affect(ch, AdrenalineSurge.class).reset(1, 200f);
 		this.activate(ch);
 	}
 	

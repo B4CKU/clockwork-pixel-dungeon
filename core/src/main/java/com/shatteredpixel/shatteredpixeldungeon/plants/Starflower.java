@@ -47,7 +47,7 @@ public class Starflower extends Plant {
 	@Override
 	public void advancedActivate( Char ch ) {
 		this.activate(ch);
-		Buff.prolong(ch, Recharging.class, Recharging.DURATION);
+		Buff.prolong(ch, Recharging.class, Recharging.DURATION/3f);
 	}
 
 	public static class Seed extends Plant.Seed{

@@ -52,7 +52,7 @@ public class Sorrowmoss extends Plant {
 
 	@Override
 	public void advancedActivate( Char ch ) {
-		Buff.affect(ch, ToxicImbue.class).set(ToxicImbue.DURATION*0.3f);
+		Buff.affect(ch, ToxicImbue.class).set(ToxicImbue.DURATION*0.2f);
 
 		if (Dungeon.level.heroFOV[pos]) {
 			CellEmitter.center( pos ).burst( PoisonParticle.SPLASH, 3 );

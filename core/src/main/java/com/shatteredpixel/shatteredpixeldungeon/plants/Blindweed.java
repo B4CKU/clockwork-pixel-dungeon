@@ -60,7 +60,7 @@ public class Blindweed extends Plant {
 
 	@Override
 	public void advancedActivate( Char ch ) {
-		Buff.affect(ch, Invisibility.class, Invisibility.DURATION/2f);
+		Buff.affect(ch, Invisibility.class, Invisibility.DURATION/5f);
 		if (Dungeon.level.heroFOV[pos]) {
 			CellEmitter.get( pos ).burst( Speck.factory( Speck.LIGHT ), 4 );
 		}

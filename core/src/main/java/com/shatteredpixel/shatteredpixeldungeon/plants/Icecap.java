@@ -56,7 +56,7 @@ public class Icecap extends Plant {
 
 	@Override
 	public void advancedActivate( Char ch ) {
-		Buff.affect(ch, FrostImbue.class, FrostImbue.DURATION*0.3f);
+		Buff.affect(ch, FrostImbue.class, FrostImbue.DURATION*0.2f);
 		this.activate(ch);
 	}
 	

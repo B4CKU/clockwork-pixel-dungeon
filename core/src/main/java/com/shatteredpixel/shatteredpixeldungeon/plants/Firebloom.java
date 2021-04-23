@@ -53,7 +53,7 @@ public class Firebloom extends Plant {
 
 	@Override
 	public void advancedActivate( Char ch ) {
-		Buff.affect(ch, FireImbue.class).set( FireImbue.DURATION*0.3f );
+		Buff.affect(ch, FireImbue.class).set( FireImbue.DURATION*0.2f );
 		this.activate(ch);
 	}
 

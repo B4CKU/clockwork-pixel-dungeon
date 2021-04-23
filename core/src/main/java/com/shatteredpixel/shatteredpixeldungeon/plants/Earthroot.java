@@ -56,7 +56,7 @@ public class Earthroot extends Plant {
 
 	@Override
 	public void advancedActivate( Char ch ) {
-		Buff.affect(ch, Barkskin.class).set(Dungeon.hero.lvl + 5, 5);
+		Buff.affect(ch, Barkskin.class).set(Dungeon.hero.lvl + 3, 5);
 		if (Dungeon.level.heroFOV[pos]) {
 			CellEmitter.bottom( pos ).start( EarthParticle.FACTORY, 0.05f, 8 );
 			Camera.main.shake( 1, 0.4f );

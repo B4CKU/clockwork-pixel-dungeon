@@ -45,7 +45,7 @@ public class Stormvine extends Plant {
 
 	@Override
 	public void advancedActivate( Char ch ) {
-		Buff.affect(ch, Levitation.class, Levitation.DURATION/2f);
+		Buff.affect(ch, Levitation.class, Levitation.DURATION/3f);
 	}
 
 	public static class Seed extends Plant.Seed {
