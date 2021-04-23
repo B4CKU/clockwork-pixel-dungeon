@@ -36,7 +36,7 @@ public class ArmorDamage extends FlavourBuff {
 
 	@Override
 	public int icon() {
-		return BuffIndicator.ARMOR;
+		return BuffIndicator.VULNERABLE;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class ArmorDamage extends FlavourBuff {
 
 		@Override
 		public int icon() {
-			return BuffIndicator.ARMOR;
+			return BuffIndicator.VULNERABLE;
 		}
 
 		@Override

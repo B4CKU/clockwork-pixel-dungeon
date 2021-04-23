@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
+import com.watabou.noosa.Image;
 
 public class Weakness extends FlavourBuff {
 
@@ -36,6 +37,11 @@ public class Weakness extends FlavourBuff {
 	@Override
 	public int icon() {
 		return BuffIndicator.WEAKNESS;
+	}
+
+	@Override
+	public void tintIcon(Image icon) {
+		icon.hardlight(0.6f, 0.6f, 0.4f);
 	}
 
 	@Override

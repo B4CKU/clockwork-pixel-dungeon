@@ -478,7 +478,7 @@ public enum Talent {
 				Buff.affect( enemy, ArmorDamage.ArmorBreak.class, ArmorDamage.ArmorBreak.DURATION );
 				Buff.detach( enemy, ArmorDamage.class );
 			}
-			else Buff.affect( enemy, ArmorDamage.class, ArmorDamage.DURATION/3f );
+			else if (enemy.buff(ArmorDamage.ArmorBreak.class) == null) Buff.affect( enemy, ArmorDamage.class, ArmorDamage.DURATION/2f );
 		}
 
 		return dmg;

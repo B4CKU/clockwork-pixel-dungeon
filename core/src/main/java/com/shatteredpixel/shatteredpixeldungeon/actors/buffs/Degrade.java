@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
+import com.watabou.noosa.Image;
 
 public class Degrade extends FlavourBuff {
 
@@ -70,6 +71,11 @@ public class Degrade extends FlavourBuff {
 	@Override
 	public int icon() {
 		return BuffIndicator.DEGRADE;
+	}
+
+	@Override
+	public void tintIcon(Image icon) {
+		icon.hardlight(0.6f, 0.6f, 0.4f);
 	}
 
 	@Override
