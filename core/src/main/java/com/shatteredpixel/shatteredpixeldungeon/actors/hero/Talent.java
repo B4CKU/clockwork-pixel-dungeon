@@ -25,9 +25,11 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArmorDamage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArtifactRecharge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
@@ -467,6 +469,15 @@ public enum Talent {
 				}
 				enemy.buff(FollowupStrikeTracker.class).detach();
 			}
+		}
+
+		if (hero.hasTalent(Talent.WEAPON_MASTERY)) {
+			ArmorDamage armordmg = enemy.buff(ArmorDamage.class);
+			if( armordmg != null && armordmg.cooldown() > ArmorDamage.DURATION) {
+				Buff.affect( enemy, ArmorDamage.ArmorBreak.class, ArmorDamage.ArmorBreak.DURATION );
+				Buff.detach( enemy, ArmorDamage.class );
+			}
+			else Buff.affect( enemy, ArmorDamage.class, ArmorDamage.DURATION/3f );
 		}
 
 		return dmg;

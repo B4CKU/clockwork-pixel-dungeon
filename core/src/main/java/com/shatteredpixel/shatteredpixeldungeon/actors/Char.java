@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Electricity;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.ToxicGas;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Adrenaline;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArcaneArmor;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArmorDamage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bleeding;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bless;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -302,7 +303,11 @@ public abstract class Char extends Actor {
 					dr = 0;
 				}
 			}
-			
+
+			if ( enemy.buff( ArmorDamage.ArmorBreak.class ) != null){
+				dr = (int)Math.floor(dr * 0.33f);
+			}
+
 			int dmg;
 			Preparation prep = buff(Preparation.class);
 			if (prep != null){
