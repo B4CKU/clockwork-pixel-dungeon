@@ -260,7 +260,7 @@ public enum Talent {
 				break;
 			case STAFFCRAFTING:
 				MagesStaff staff = new MagesStaff();
-				if (!staff.collect()) {
+				if (!staff.identify().collect()) {
 					Dungeon.level.drop(staff, hero.pos);
 				}
 				break;

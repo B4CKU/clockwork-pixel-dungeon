@@ -148,13 +148,6 @@ public class MagesStaff extends MeleeWeapon {
 
 	@Override
 	public int proc(Char attacker, Char defender, int damage) {
-		if (attacker.buff(Talent.StaffcraftingEmpoweredStrikeTracker.class) != null) {
-			attacker.buff(Talent.StaffcraftingEmpoweredStrikeTracker.class).detach();
-			damage = Math.round( damage * 1.4f);
-			// if we have empowered strike II, cannot deal less than 50% of possible damage
-			if(Dungeon.hero.pointsInTalent(Talent.STAFFCRAFTING_EMPOWERED) == 2 ) damage = (int)Math.max(damage ,max(buffedLvl())*0.7f);
-		}
-
 		if (wand.curCharges >= wand.maxCharges && attacker instanceof Hero && Random.Int(5) < ((Hero) attacker).pointsInTalent(Talent.EXCESS_CHARGE)){
 			Buff.affect(attacker, Barrier.class).setShield(buffedLvl()*2);
 		}

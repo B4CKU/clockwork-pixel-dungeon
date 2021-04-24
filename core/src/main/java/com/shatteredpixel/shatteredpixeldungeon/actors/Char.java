@@ -79,6 +79,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfLightning;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Blazing;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Grim;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Shocking;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.darts.ShockingDart;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
@@ -322,6 +323,15 @@ public abstract class Char extends Actor {
 						dmg = (int)Math.floor(dmg * 1.5f);
 						Buff.detach(this, SteadyAim.class);
 						Buff.affect(this, Talent.SteadyAimCooldown.class, 20f);
+					}
+				}
+				if (h.belongings.weapon instanceof MagesStaff) {
+					if (buff(Talent.StaffcraftingEmpoweredStrikeTracker.class) != null) {
+						buff(Talent.StaffcraftingEmpoweredStrikeTracker.class).detach();
+						dmg = Math.round( dmg * 1.3f);
+						// if we have empowered strike II, penetrate armor
+						if(Dungeon.hero.pointsInTalent(Talent.STAFFCRAFTING_EMPOWERED) == 2 )
+							dr = 0;
 					}
 				}
 			}
