@@ -26,7 +26,6 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.effects.SpellSprite;
-import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal.WarriorShield;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
@@ -71,7 +70,7 @@ public class Berserk extends Buff {
 	@Override
 	public boolean act() {
 		if (berserking()){
-			ShieldBuff buff = target.buff(WarriorShield.class);
+			ShieldBuff buff = target.buff(KnightShield.class);
 			if (target.HP <= 0) {
 				int dmg = 1 + (int)Math.ceil(target.shielding() * 0.05f);
 				if (buff != null && buff.shielding() > 0) {
@@ -89,9 +88,11 @@ public class Berserk extends Buff {
 				}
 			} else {
 				state = State.RECOVERING;
-				levelRecovery = LEVEL_RECOVER_START - Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA)/3f;
+				levelRecovery = LEVEL_RECOVER_START;
+				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_DETERMINATION)==2) levelRecovery = levelRecovery / 2f;
 				if (buff != null) buff.absorbDamage(buff.shielding());
-				power = 0f;
+				if (((Hero)target).pointsInTalent(Talent.BERSERKING_DETERMINATION) < 2)
+					power = 0f;
 			}
 		} else if (state == State.NORMAL) {
 			power -= GameMath.gate(0.1f, power, 1f) * 0.067f * Math.pow((target.HP/(float)target.HT), 2);
@@ -114,13 +115,14 @@ public class Berserk extends Buff {
 	}
 
 	public boolean berserking(){
-		if (target.HP == 0 && state == State.NORMAL && power >= 1f){
+		if (target.HP == 0 && state == State.NORMAL && power >= 0.75f && Dungeon.hero.hasTalent(Talent.BERSERKING_DETERMINATION)){
 
-			WarriorShield shield = target.buff(WarriorShield.class);
+			KnightShield shield = target.buff(KnightShield.class);
 			if (shield != null){
 				state = State.BERSERK;
-				int shieldAmount = shield.maxShield() * 8;
-				shieldAmount = Math.round(shieldAmount * (1f + Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA)/6f));
+				//int shieldAmount = shield.maxShield() * 8;
+				int shieldAmount = Math.round(target.HT * 0.67f);
+				//shieldAmount = Math.round(shieldAmount * (1f + Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA)/6f));
 				shield.supercharge(shieldAmount);
 
 				SpellSprite.show(target, SpellSprite.BERSERK);
@@ -134,9 +136,8 @@ public class Berserk extends Buff {
 	}
 	
 	public void damage(int damage){
-		if (state == State.RECOVERING) return;
-		float maxPower = 1f + 0.15f*((Hero)target).pointsInTalent(Talent.ENDLESS_RAGE);
-		power = Math.min(maxPower, power + (damage/(float)target.HT)/3f );
+		if (state == State.RECOVERING && ((Hero)target).pointsInTalent(Talent.BERSERKING_DETERMINATION) < 2) return;
+		power = Math.min(1f, power + (damage/(float)target.HT)/2f);
 		BuffIndicator.refreshHero(); //show new power immediately
 	}
 
@@ -159,7 +160,7 @@ public class Berserk extends Buff {
 	public void tintIcon(Image icon) {
 		switch (state){
 			case NORMAL: default:
-				if (power < 1f) icon.hardlight(1f, 0.5f, 0f);
+				if (power < 0.75f) icon.hardlight(1f, 0.5f, 0f);
 				else            icon.hardlight(1f, 0f, 0f);
 				break;
 			case BERSERK:
@@ -197,15 +198,26 @@ public class Berserk extends Buff {
 
 	@Override
 	public String desc() {
+		String desc = "";
 		float dispDamage = (damageFactor(10000) / 100f) - 100f;
 		switch (state){
 			case NORMAL: default:
-				return Messages.get(this, "angered_desc", Math.floor(power * 100f), dispDamage);
+				desc += Messages.get(this, "angered_desc");
+				if (Dungeon.hero.hasTalent(Talent.BERSERKING_DETERMINATION))
+					desc += " " + Messages.get(this, "determination");
+				desc += "\n\n" + Messages.get(this, "stats", Math.floor(power * 100f), dispDamage );
+				break;
 			case BERSERK:
-				return Messages.get(this, "berserk_desc");
+				desc += Messages.get(this, "berserk_desc");
+				break;
 			case RECOVERING:
-				return Messages.get(this, "recovering_desc", levelRecovery);
+				desc += Messages.get(this, "recovering_desc", levelRecovery);
+				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_DETERMINATION) == 2)
+					desc += "\n\n" + Messages.get(this, "stats", Math.floor(power * 100f), dispDamage );
+				else
+					desc += "\n\n" + Messages.get(this, "determination_exhaust");
+				break;
 		}
-		
+		return desc;
 	}
 }

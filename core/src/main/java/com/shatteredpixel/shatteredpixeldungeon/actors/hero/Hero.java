@@ -1115,6 +1115,13 @@ public class Hero extends Char {
 			break;
 		default:
 		}
+
+		if (damage > 0 && hasTalent(Talent.BERSERKING_ANGER)) {
+			Berserk berserk = buff(Berserk.class);
+			if (berserk == null)
+				berserk = Buff.affect(this, Berserk.class);
+			berserk.damage(Math.round(damage/2f));
+		}
 		
 		return damage;
 	}
@@ -1122,7 +1129,7 @@ public class Hero extends Char {
 	@Override
 	public int defenseProc( Char enemy, int damage ) {
 		
-		if (damage > 0 && subClass == HeroSubClass.BERSERKER){
+		if (damage > 0 && (subClass == HeroSubClass.BERSERKER || hasTalent(Talent.BERSERKING) )){
 			Berserk berserk = Buff.affect(this, Berserk.class);
 			berserk.damage(damage);
 		}
