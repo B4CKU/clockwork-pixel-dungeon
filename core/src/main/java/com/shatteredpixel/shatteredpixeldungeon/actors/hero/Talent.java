@@ -122,26 +122,32 @@ public enum Talent {
 	ARMOR_MASTERY(1,1), WEAPON_MASTERY(2, 1), ARCANE_MASTERY(3, 1),
 	AGILITY_MASTERY(4, 1), CRAFT_MASTERY(5, 1), ELEMENTAL_MASTERY(6, 1),
 
-	//Adventurer T2
-	ARMOR_WEAPON(0 , 1, ARMOR_MASTERY, WEAPON_MASTERY), ARMOR_ARCANE(0 , 1, ARMOR_MASTERY, ARCANE_MASTERY),
-	ARMOR_AGILITY(0, 1, ARMOR_MASTERY, AGILITY_MASTERY), ARMOR_CRAFT(0, 1, ARMOR_MASTERY, CRAFT_MASTERY),
+	//Adventurer Skilltrees
+	STAFFCRAFTING(7, 1, WEAPON_MASTERY, ARCANE_MASTERY), STAFFCRAFTING_CHANNELING(8, 2, STAFFCRAFTING), STAFFCRAFTING_EMPOWERED(9, 2, STAFFCRAFTING),
+	ARMOR_WEAPON(0 , 1, ARMOR_MASTERY, WEAPON_MASTERY),
+	ARMOR_ARCANE(0 , 1, ARMOR_MASTERY, ARCANE_MASTERY),
+	ARMOR_AGILITY(0, 1, ARMOR_MASTERY, AGILITY_MASTERY),
+	ARMOR_CRAFT(0, 1, ARMOR_MASTERY, CRAFT_MASTERY),
 	ARMOR_ELEMENTS(0, 1, ARMOR_MASTERY, ELEMENTAL_MASTERY),
-	WEAPON_ARCANE(0, 1, WEAPON_MASTERY, ARCANE_MASTERY), WEAPON_AGILITY(0, 1, WEAPON_MASTERY, AGILITY_MASTERY),
-	WEAPON_CRAFT(0, 1, WEAPON_MASTERY, CRAFT_MASTERY), WEAPON_ELEMENTS(0, 1, WEAPON_MASTERY, ELEMENTAL_MASTERY),
-	ARCANE_AGILITY(0, 1, ARCANE_MASTERY, AGILITY_MASTERY), ARCANE_CRAFT(0, 1, ARCANE_MASTERY, CRAFT_MASTERY),
+	WEAPON_AGILITY(0, 1, WEAPON_MASTERY, AGILITY_MASTERY),
+	WEAPON_CRAFT(0, 1, WEAPON_MASTERY, CRAFT_MASTERY),
+	WEAPON_ELEMENTS(0, 1, WEAPON_MASTERY, ELEMENTAL_MASTERY),
+	ARCANE_AGILITY(0, 1, ARCANE_MASTERY, AGILITY_MASTERY),
+	ARCANE_CRAFT(0, 1, ARCANE_MASTERY, CRAFT_MASTERY),
 	ARCANE_ELEMENTS(0, 1, ARCANE_MASTERY, ELEMENTAL_MASTERY),
-	AGILITY_CRAFT(0, 1, AGILITY_MASTERY, CRAFT_MASTERY), AGILITY_ELEMENTS(0, 1, AGILITY_MASTERY, ELEMENTAL_MASTERY),
+	AGILITY_CRAFT(0, 1, AGILITY_MASTERY, CRAFT_MASTERY),
+	AGILITY_ELEMENTS(0, 1, AGILITY_MASTERY, ELEMENTAL_MASTERY),
 	CRAFT_ELEMENTS(0, 1, CRAFT_MASTERY, ELEMENTAL_MASTERY);
 
 
 	public static class ImprovisedProjectileCooldown extends FlavourBuff{};
 	public static class LethalMomentumTracker extends FlavourBuff{};
 	public static class WandPreservationCounter extends CounterBuff{};
-	public static class EmpoweredStrikeTracker extends FlavourBuff{};
 	public static class BountyHunterTracker extends FlavourBuff{};
 	public static class RejuvenatingStepsCooldown extends FlavourBuff{};
 	public static class SeerShotCooldown extends FlavourBuff{};
 	public static class SteadyAimCooldown extends FlavourBuff{};
+	public static class StaffcraftingEmpoweredStrikeTracker extends FlavourBuff{};
 
 	int icon;
 	int maxPoints;
@@ -250,6 +256,12 @@ public enum Talent {
 					Potion p = Reflection.newInstance(Random.element(Potion.getUnknown()));
 					p.identify();
 					GLog.p( Messages.get(Hero.class, "identify", p) );
+				}
+				break;
+			case STAFFCRAFTING:
+				MagesStaff staff = new MagesStaff();
+				if (!staff.collect()) {
+					Dungeon.level.drop(staff, hero.pos);
 				}
 				break;
 		}
@@ -512,13 +524,13 @@ public enum Talent {
 				Collections.addAll(tierTalents, HEARTY_MEAL, ARMSMASTERS_INTUITION, TEST_SUBJECT, IRON_WILL);
 				break;
 			case MAGE:
-				Collections.addAll(tierTalents, EMPOWERING_MEAL, SCHOLARS_INTUITION, TESTED_HYPOTHESIS, BACKUP_BARRIER);
+				Collections.addAll(tierTalents, ENERGIZING_MEAL, ENERGIZING_UPGRADE, WAND_PRESERVATION, ARCANE_VISION, SHIELD_BATTERY);
 				break;
 			case ROGUE:
-				Collections.addAll(tierTalents, CACHED_RATIONS, THIEFS_INTUITION, SUCKER_PUNCH, PROTECTIVE_SHADOWS);
+				Collections.addAll(tierTalents, MYSTICAL_MEAL, MYSTICAL_UPGRADE, WIDE_SEARCH, SILENT_STEPS, ROGUES_FORESIGHT);
 				break;
 			case HUNTRESS:
-				Collections.addAll(tierTalents, NATURES_BOUNTY, SURVIVALISTS_INTUITION, FOLLOWUP_STRIKE, NATURES_AID);
+				Collections.addAll(tierTalents, INVIGORATING_MEAL, RESTORED_NATURE, REJUVENATING_STEPS, HEIGHTENED_SENSES, DURABLE_PROJECTILES);
 				break;
 			case ADVENTURER:
 				Collections.addAll(tierTalents, ARMOR_MASTERY, WEAPON_MASTERY, ARCANE_MASTERY, AGILITY_MASTERY, CRAFT_MASTERY, ELEMENTAL_MASTERY);
@@ -545,8 +557,8 @@ public enum Talent {
 				break;
 			case ADVENTURER:
 				//technically all of them are available, but only some of them are visible at the time
-				Collections.addAll(tierTalents, ARMOR_WEAPON, ARMOR_ARCANE, ARMOR_AGILITY, ARMOR_CRAFT, ARMOR_ELEMENTS,
-												WEAPON_ARCANE, WEAPON_AGILITY, WEAPON_CRAFT, WEAPON_ELEMENTS, ARCANE_AGILITY,
+				Collections.addAll(tierTalents, STAFFCRAFTING, ARMOR_WEAPON, ARMOR_ARCANE, ARMOR_AGILITY, ARMOR_CRAFT,
+												ARMOR_ELEMENTS,	WEAPON_AGILITY, WEAPON_CRAFT, WEAPON_ELEMENTS, ARCANE_AGILITY,
 												ARCANE_CRAFT, ARCANE_ELEMENTS, AGILITY_CRAFT, AGILITY_ELEMENTS, CRAFT_ELEMENTS);
 				break;
 		}
@@ -568,8 +580,9 @@ public enum Talent {
 				break;
 			case HUNTRESS:
 				Collections.addAll(tierTalents, POINT_BLANK, SEER_SHOT);
+			case ADVENTURER:
+				Collections.addAll(tierTalents, STAFFCRAFTING_CHANNELING, STAFFCRAFTING_EMPOWERED);
 				break;
-			case ADVENTURER: break;
 		}
 		for (Talent talent : tierTalents){
 			talents.get(2).put(talent, 0);

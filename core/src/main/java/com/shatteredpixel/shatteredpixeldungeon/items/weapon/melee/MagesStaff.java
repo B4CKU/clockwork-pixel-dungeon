@@ -71,7 +71,7 @@ public class MagesStaff extends MeleeWeapon {
 		hitSound = Assets.Sounds.HIT;
 		hitSoundPitch = 1.1f;
 
-		tier = 1;
+		tier = 2;
 
 		defaultAction = AC_ZAP;
 		usesTargeting = true;
@@ -86,7 +86,7 @@ public class MagesStaff extends MeleeWeapon {
 
 	@Override
 	public int max(int lvl) {
-		return  4*(tier+1) +    //8 base damage, down from 10
+		return  4*(tier+1) +    //12 base damage, down from 15
 				lvl*(tier+1);   //scaling unaffected
 	}
 
@@ -148,9 +148,11 @@ public class MagesStaff extends MeleeWeapon {
 
 	@Override
 	public int proc(Char attacker, Char defender, int damage) {
-		if (attacker.buff(Talent.EmpoweredStrikeTracker.class) != null){
-			attacker.buff(Talent.EmpoweredStrikeTracker.class).detach();
-			damage = Math.round( damage * (1f + Dungeon.hero.pointsInTalent(Talent.EMPOWERED_STRIKE)/5f));
+		if (attacker.buff(Talent.StaffcraftingEmpoweredStrikeTracker.class) != null) {
+			attacker.buff(Talent.StaffcraftingEmpoweredStrikeTracker.class).detach();
+			damage = Math.round( damage * 1.4f);
+			// if we have empowered strike II, cannot deal less than 50% of possible damage
+			if(Dungeon.hero.pointsInTalent(Talent.STAFFCRAFTING_EMPOWERED) == 2 ) damage = (int)Math.max(damage ,max(buffedLvl())*0.7f);
 		}
 
 		if (wand.curCharges >= wand.maxCharges && attacker instanceof Hero && Random.Int(5) < ((Hero) attacker).pointsInTalent(Talent.EXCESS_CHARGE)){
@@ -165,8 +167,9 @@ public class MagesStaff extends MeleeWeapon {
 		}
 
 		if (wand != null &&
-				attacker instanceof Hero && ((Hero)attacker).subClass == HeroSubClass.BATTLEMAGE) {
-			if (wand.curCharges < wand.maxCharges) wand.partialCharge += 0.5f;
+				attacker instanceof Hero && (((Hero)attacker).subClass == HeroSubClass.BATTLEMAGE || ((Hero) attacker).hasTalent(Talent.STAFFCRAFTING_CHANNELING))) {
+			if (((Hero)attacker).subClass == HeroSubClass.BATTLEMAGE || ((Hero) attacker).pointsInTalent(Talent.STAFFCRAFTING_CHANNELING) == 2)
+				wand.gainCharge(0.25f);
 			ScrollOfRecharging.charge((Hero)attacker);
 			wand.onHit(this, attacker, defender, damage);
 		}
@@ -178,7 +181,7 @@ public class MagesStaff extends MeleeWeapon {
 		int reach = super.reachFactor(owner);
 		if (owner instanceof Hero
 				&& wand instanceof WandOfDisintegration
-				&& ((Hero)owner).subClass == HeroSubClass.BATTLEMAGE){
+				&& (((Hero)owner).subClass == HeroSubClass.BATTLEMAGE || ((Hero) owner).hasTalent(Talent.STAFFCRAFTING_CHANNELING))){
 			reach++;
 		}
 		return reach;
@@ -203,7 +206,7 @@ public class MagesStaff extends MeleeWeapon {
 
 	public Item imbueWand(Wand wand, Char owner){
 
-		int oldStaffcharges = this.wand.curCharges;
+		//int oldStaffcharges = this.wand.curCharges;
 
 		if (owner == Dungeon.hero && Dungeon.hero.hasTalent(Talent.WAND_PRESERVATION)
 				&& Random.Float() < 0.34f + 0.33f*Dungeon.hero.pointsInTalent(Talent.WAND_PRESERVATION)){
@@ -231,7 +234,7 @@ public class MagesStaff extends MeleeWeapon {
 		level(targetLevel);
 		this.wand = wand;
 		updateWand(false);
-		wand.curCharges = Math.min(wand.maxCharges, wand.curCharges+oldStaffcharges);
+		wand.curCharges = Math.min(wand.maxCharges, wand.curCharges/*+oldStaffcharges*/);
 		if (owner != null) wand.charge(owner);
 
 		//This is necessary to reset any particles.
@@ -317,7 +320,7 @@ public class MagesStaff extends MeleeWeapon {
 			if (!cursed || !cursedKnown)    info += " " + wand.statsDesc();
 			else                            info += " " + Messages.get(this, "cursed_wand");
 
-			if (Dungeon.hero.subClass == HeroSubClass.BATTLEMAGE){
+			if (Dungeon.hero.subClass == HeroSubClass.BATTLEMAGE || Dungeon.hero.hasTalent(Talent.STAFFCRAFTING_CHANNELING)){
 				info += "\n\n" + Messages.get(wand, "bmage_desc");
 			}
 		}

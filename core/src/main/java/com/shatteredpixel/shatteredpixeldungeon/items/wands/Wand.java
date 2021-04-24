@@ -386,8 +386,8 @@ public abstract class Wand extends Item {
 				//grants 4/6 shielding
 				Buff.affect(Dungeon.hero, Barrier.class).setShield(2 + 2 * Dungeon.hero.pointsInTalent(Talent.BACKUP_BARRIER));
 			}
-			if (Dungeon.hero.hasTalent(Talent.EMPOWERED_STRIKE)){
-				Buff.prolong(Dungeon.hero, Talent.EmpoweredStrikeTracker.class, 5f);
+			if (Dungeon.hero.hasTalent(Talent.STAFFCRAFTING_EMPOWERED)){
+				Buff.prolong(Dungeon.hero, Talent.StaffcraftingEmpoweredStrikeTracker.class, 5f);
 			}
 		}
 
