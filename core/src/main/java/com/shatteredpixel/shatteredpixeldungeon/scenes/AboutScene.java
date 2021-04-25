@@ -57,15 +57,31 @@ public class AboutScene extends PixelScene {
 
 		//*** Clockwork Pixel Dungeon Credits ***
 
-		final int BCKU_COLOR = 0xFFB855;
+		final int BCKU_COLOR = 0xFFA500;
 		CreditsBlock cpdx = new CreditsBlock(true, BCKU_COLOR,
 				"Clockwork Pixel Dungeon",
-				Icons.SHPX.get(),
+				Icons.BACKU.get(),
 				"Developed by: _B4CKU_\nBased on Shattered Pixel Dungeon's open source",
 				null,
 				null);
-		cpdx.setRect((Camera.main.width - colWidth)/2f, 6, colWidth, 0);
+		cpdx.setRect((w - fullWidth)/2f, 6, colWidth, 0);
 		content.add(cpdx);
+
+		final int QUARTOFEL_COLOR = 0x785027;
+		CreditsBlock quartofel = new CreditsBlock(false, QUARTOFEL_COLOR,
+				"Graphic Design & New Spritework:",
+				Icons.QUARTOFEL.get(),
+				"Quartofel",
+				"github.com/Quartofel",
+				"https://github.com/Quartofel");
+		quartofel.setSize(colWidth/2f, 0);
+		if (landscape()){
+			quartofel.setPos(cpdx.right(), cpdx.top() + (cpdx.height() - quartofel.height())/2f);
+		} else {
+			quartofel.setPos((w - (colWidth/2f))/2f, cpdx.bottom()+5);
+		}
+
+		content.add(quartofel);
 
 		//*** Shattered Pixel Dungeon Credits ***
 
@@ -81,7 +97,13 @@ public class AboutScene extends PixelScene {
 				"Developed by: _Evan Debenham_\nBased on Pixel Dungeon's open source",
 				"ShatteredPixel.com",
 				shpxLink);
-		shpx.setRect((w - fullWidth)/2f, cpdx.bottom() + 8, colWidth, 0);
+		shpx.setSize(colWidth, 0);
+		if (landscape()){
+			shpx.setPos((w - fullWidth)/2f, cpdx.bottom() + 8);
+		} else {
+			shpx.setPos((w - fullWidth)/2f, quartofel.bottom() + 8);
+		}
+
 		content.add(shpx);
 
 		CreditsBlock alex = new CreditsBlock(false, Window.SHPX_COLOR,
@@ -197,7 +219,6 @@ public class AboutScene extends PixelScene {
 				null,
 				"_ClockworkPD_ is a project that became a reality only thanks to these wonderful folks below! Thank you so much to all of you!\n\n" +
 						"My wonderful girlfriend, _RaveeQuoth,_\n" +
-						"_Quartofel,_\n" +
 						"_MitiGames,_\n" +
 						"_NeoSlav,_\n" +
 						"_484Palkia,_\n" +

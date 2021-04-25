@@ -84,7 +84,9 @@ public enum Icons {
 	CHARLIE,
 	CUBE_CODE,
 	PURIGRO,
-	ARCNOR;
+	ARCNOR,
+	QUARTOFEL,
+	BACKU;
 
 	public Image get() {
 		return get( this );
@@ -231,6 +233,14 @@ public enum Icons {
 			break;
 		case ARCNOR:
 			icon.frame( icon.texture.uvRect( 64, 96, 96, 128 ) );
+			icon.scale.set(PixelScene.align(0.49f));
+			break;
+		case QUARTOFEL:
+			icon.frame( icon.texture.uvRect( 0, 128, 32, 160 ) );
+			icon.scale.set(PixelScene.align(0.49f));
+			break;
+		case BACKU:
+			icon.frame( icon.texture.uvRect( 32, 128, 64, 160 ) );
 			icon.scale.set(PixelScene.align(0.49f));
 			break;
 		case PURIGRO:

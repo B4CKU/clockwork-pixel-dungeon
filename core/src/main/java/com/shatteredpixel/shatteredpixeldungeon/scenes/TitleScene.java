@@ -79,8 +79,8 @@ public class TitleScene extends PixelScene {
 
 		align(title);
 
-		placeTorch(title.x + 22, title.y + 46);
-		placeTorch(title.x + title.width - 22, title.y + 46);
+		//placeTorch(title.x + 22, title.y + 18);
+		//placeTorch(title.x + title.width - 22, title.y + 18);
 
 		Image signs = new Image( BannerSprites.get( BannerSprites.Type.PIXEL_DUNGEON_SIGNS ) ) {
 			private float time = 0;
@@ -168,7 +168,7 @@ public class TitleScene extends PixelScene {
 				ShatteredPixelDungeon.switchScene( AboutScene.class );
 			}
 		};
-		btnAbout.icon(Icons.get(Icons.SHPX));
+		btnAbout.icon(Icons.get(Icons.BACKU));
 		add(btnAbout);
 		
 		final int BTN_HEIGHT = 20;
@@ -208,11 +208,11 @@ public class TitleScene extends PixelScene {
 		fadeIn();
 	}
 	
-	private void placeTorch( float x, float y ) {
+	/*private void placeTorch( float x, float y ) {
 		Fireball fb = new Fireball();
 		fb.setPos( x, y );
 		add( fb );
-	}
+	}*/
 
 	private static class NewsButton extends StyledButton {
 

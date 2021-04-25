@@ -78,7 +78,7 @@ public class TalentsPane extends ScrollPane {
 		sep = new ColorBlock(0, 1, 0xFF000000);
 		content.add(sep);
 
-		blocker = new ColorBlock(0, 0, 0xFF222222);
+		blocker = new ColorBlock(0, 0, 0xFF111111);
 		content.add(blocker);
 
 		if (tiersAvailable == 1) {
@@ -183,7 +183,7 @@ public class TalentsPane extends ScrollPane {
 				if (i >= openStars && i < (openStars + usedStars)){
 					im.tint(0.75f, 0.75f, 0.75f, 0.9f);
 				} else if (i >= (openStars + usedStars)){
-					im.tint(0f, 0f, 0f, 0.9f);
+					im.tint(0f, 0f, 0f, 1f);
 				}
 			}
 		}
