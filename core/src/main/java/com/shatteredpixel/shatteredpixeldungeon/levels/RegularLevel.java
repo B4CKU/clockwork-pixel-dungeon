@@ -32,12 +32,16 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mimic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
+import com.shatteredpixel.shatteredpixeldungeon.items.Honeypot;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
+import com.shatteredpixel.shatteredpixeldungeon.items.bombs.Bomb;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.SmallRation;
 import com.shatteredpixel.shatteredpixeldungeon.items.journal.GuidePage;
 import com.shatteredpixel.shatteredpixeldungeon.items.keys.GoldenKey;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.AlchemicalCatalyst;
+import com.shatteredpixel.shatteredpixeldungeon.items.spells.ArcaneCatalyst;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Document;
 import com.shatteredpixel.shatteredpixeldungeon.levels.builders.Builder;
 import com.shatteredpixel.shatteredpixeldungeon.levels.builders.FigureEightBuilder;
@@ -437,10 +441,26 @@ public abstract class RegularLevel extends Level {
 
 		//craft mastery drops additional consumable every level
 		if (Dungeon.hero.hasTalent(Talent.CRAFT_MASTERY)){
-			if (Random.Int(1) == 0)
-				item = Generator.random(Generator.Category.SCROLL);
-			else
-				item = Generator.random(Generator.Category.POTION);
+			switch(Random.Int(7)) {
+				case 0: case 1: default:
+					item = Generator.random(Generator.Category.SCROLL);
+					break;
+				case 2: case 3:
+					item = Generator.random(Generator.Category.POTION);
+					break;
+				case 4:
+					item = new ArcaneCatalyst();
+					break;
+				case 5:
+					item = new AlchemicalCatalyst();
+					break;
+				case 6:
+					item = new Bomb();
+					break;
+				case 7:
+					item = new Honeypot();
+					break;
+			}
 			int cell = randomDropCell();
 			drop( item, cell ).type = Heap.Type.HEAP;
 		}
