@@ -115,7 +115,7 @@ public class Berserk extends Buff {
 	}
 
 	public boolean berserking(){
-		if (target.HP == 0 && state == State.NORMAL && power >= 0.75f && Dungeon.hero.hasTalent(Talent.BERSERKING_DETERMINATION)){
+		if (target.HP == 0 && state == State.NORMAL && power >= 0.8f && Dungeon.hero.hasTalent(Talent.BERSERKING_DETERMINATION)){
 
 			KnightShield shield = target.buff(KnightShield.class);
 			if (shield != null){
@@ -137,7 +137,7 @@ public class Berserk extends Buff {
 	
 	public void damage(int damage){
 		if (state == State.RECOVERING && ((Hero)target).pointsInTalent(Talent.BERSERKING_DETERMINATION) < 2) return;
-		power = Math.min(1f, power + (damage/(float)target.HT)/2f);
+		power = Math.min(1f, power + (damage/(float)target.HT)/3f);
 		BuffIndicator.refreshHero(); //show new power immediately
 	}
 
@@ -160,7 +160,7 @@ public class Berserk extends Buff {
 	public void tintIcon(Image icon) {
 		switch (state){
 			case NORMAL: default:
-				if (power < 0.75f) icon.hardlight(1f, 0.5f, 0f);
+				if (power < 0.8f) icon.hardlight(1f, 0.5f, 0f);
 				else            icon.hardlight(1f, 0f, 0f);
 				break;
 			case BERSERK:

@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArmorDamage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArtifactRecharge;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Berserk;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
@@ -499,11 +500,37 @@ public enum Talent {
 			}
 		}
 
+		//this is kinda ugly, but it will do for now
+		if (hero.pointsInTalent(Talent.BERSERKING_ANGER) == 2 && hero.buff(AngerIssuesTracker.class) == null) {
+			Berserk berserk = hero.buff(Berserk.class);
+			if (berserk != null && berserk.rageAmount() >= 0.8f) {
+
+				//get all possible targets, check how far away they are from us, then if the list is not empty, randomize it and deal damage to one of the targets
+				ArrayList<Char> targets = new ArrayList<>();
+				for (int i : PathFinder.NEIGHBOURS8) {
+					Char potential_target = Actor.findChar(enemy.pos + i);
+					if (potential_target instanceof Mob && Dungeon.level.adjacent( hero.pos, potential_target.pos )
+						&& potential_target.alignment == Char.Alignment.ENEMY && !hero.isCharmedBy(potential_target))
+						targets.add(potential_target);
+				}
+
+				Mob second_target = (Mob)Random.element( targets );
+
+				//i was trying literally anything to make it alright i had no fucking clue it would be this easy
+				if (second_target != null) {
+					Buff.affect(hero, AngerIssuesTracker.class);
+					hero.attack(second_target);
+					Buff.detach(hero, AngerIssuesTracker.class);
+				}
+			}
+		}
+
 		return dmg;
 	}
 
 	public static class SuckerPunchTracker extends Buff{};
 	public static class FollowupStrikeTracker extends Buff{};
+	public static class AngerIssuesTracker extends Buff{};
 
 	public static final int MAX_TALENT_TIERS = 3;
 
