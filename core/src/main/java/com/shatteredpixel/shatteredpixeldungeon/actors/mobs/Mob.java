@@ -846,6 +846,21 @@ public abstract class Mob extends Char {
 					}
 				}
 
+				//this is a bit ugly, but well.. is there another way?
+				if (enemy instanceof Hero && ((Hero) enemy).hasTalent(Talent.DREAMWEAVER)) {
+					Talent.DreamweaverTracker tracker = buff(Talent.DreamweaverTracker.class);
+					if (tracker != null) {
+						if (!tracker.woken_up) {
+							tracker.stacks++;
+							enemyStealth = Float.POSITIVE_INFINITY;
+						}
+					}
+					else {
+						Buff.affect(Mob.this, Talent.DreamweaverTracker.class);
+						enemyStealth = Float.POSITIVE_INFINITY;
+					}
+				}
+
 				if (Random.Float( distance( enemy ) + enemyStealth ) < 1) {
 					awaken(enemyInFOV);
 					return true;

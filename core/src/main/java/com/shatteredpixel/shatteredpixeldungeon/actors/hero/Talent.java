@@ -126,6 +126,7 @@ public enum Talent {
 	//Adventurer Skilltrees
 	STAFFCRAFTING(7, 1, WEAPON_MASTERY, ARCANE_MASTERY), STAFFCRAFTING_CHANNELING(8, 2, STAFFCRAFTING), STAFFCRAFTING_EMPOWERED(9, 2, STAFFCRAFTING),
 	BERSERKING(10 , 1, ARMOR_MASTERY, WEAPON_MASTERY), BERSERKING_ANGER(11 , 2, BERSERKING), BERSERKING_DETERMINATION(12 , 2, BERSERKING),
+	DREAMWEAVER(13, 1, AGILITY_MASTERY, ELEMENTAL_MASTERY), DREAMWEAVER_SANDMAN(14, 2, DREAMWEAVER), DREAMWEAVER_NIGHTMARE(15, 2, DREAMWEAVER),
 	ARMOR_ARCANE(0 , 1, ARMOR_MASTERY, ARCANE_MASTERY),
 	ARMOR_AGILITY(0, 1, ARMOR_MASTERY, AGILITY_MASTERY),
 	ARMOR_CRAFT(0, 1, ARMOR_MASTERY, CRAFT_MASTERY),
@@ -137,7 +138,6 @@ public enum Talent {
 	ARCANE_CRAFT(0, 1, ARCANE_MASTERY, CRAFT_MASTERY),
 	ARCANE_ELEMENTS(0, 1, ARCANE_MASTERY, ELEMENTAL_MASTERY),
 	AGILITY_CRAFT(0, 1, AGILITY_MASTERY, CRAFT_MASTERY),
-	AGILITY_ELEMENTS(0, 1, AGILITY_MASTERY, ELEMENTAL_MASTERY),
 	CRAFT_ELEMENTS(0, 1, CRAFT_MASTERY, ELEMENTAL_MASTERY);
 
 
@@ -531,6 +531,31 @@ public enum Talent {
 	public static class SuckerPunchTracker extends Buff{};
 	public static class FollowupStrikeTracker extends Buff{};
 	public static class AngerIssuesTracker extends Buff{};
+	public static class DreamweaverTracker extends Buff{
+		public int stacks = 0;
+		public boolean woken_up = false;
+		@Override
+		public boolean act() {
+			if ((target instanceof Mob && ((Mob)target).state != ((Mob)target).SLEEPING) || stacks >= 6)
+				woken_up = true;
+			spend( TICK );
+			return true;
+		}
+		private static final String STACKS = "stacks";
+		private static final String WOKEN_UP = "woken_up";
+		@Override
+		public void storeInBundle(Bundle bundle) {
+			super.storeInBundle(bundle);
+			bundle.put(STACKS, stacks);
+			bundle.put(WOKEN_UP, woken_up);
+		}
+		@Override
+		public void restoreFromBundle(Bundle bundle) {
+			super.restoreFromBundle(bundle);
+			stacks = bundle.getInt(STACKS);
+			woken_up = bundle.getBoolean(WOKEN_UP);
+		}
+	};
 
 	public static final int MAX_TALENT_TIERS = 3;
 
@@ -586,7 +611,7 @@ public enum Talent {
 				//technically all of them are available, but only some of them are visible at the time
 				Collections.addAll(tierTalents, STAFFCRAFTING, BERSERKING, ARMOR_ARCANE, ARMOR_AGILITY, ARMOR_CRAFT,
 												ARMOR_ELEMENTS,	WEAPON_AGILITY, WEAPON_CRAFT, WEAPON_ELEMENTS, ARCANE_AGILITY,
-												ARCANE_CRAFT, ARCANE_ELEMENTS, AGILITY_CRAFT, AGILITY_ELEMENTS, CRAFT_ELEMENTS);
+												ARCANE_CRAFT, ARCANE_ELEMENTS, AGILITY_CRAFT, DREAMWEAVER, CRAFT_ELEMENTS);
 				break;
 		}
 		for (Talent talent : tierTalents){
@@ -608,7 +633,8 @@ public enum Talent {
 			case HUNTRESS:
 				Collections.addAll(tierTalents, POINT_BLANK, SEER_SHOT);
 			case ADVENTURER:
-				Collections.addAll(tierTalents, STAFFCRAFTING_CHANNELING, STAFFCRAFTING_EMPOWERED, BERSERKING_ANGER, BERSERKING_DETERMINATION);
+				Collections.addAll(tierTalents, STAFFCRAFTING_CHANNELING, STAFFCRAFTING_EMPOWERED, BERSERKING_ANGER, BERSERKING_DETERMINATION,
+						DREAMWEAVER_SANDMAN, DREAMWEAVER_NIGHTMARE);
 				break;
 		}
 		for (Talent talent : tierTalents){
