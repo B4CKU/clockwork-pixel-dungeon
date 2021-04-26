@@ -328,7 +328,7 @@ public abstract class Char extends Actor {
 				if (h.belongings.weapon instanceof MagesStaff) {
 					if (buff(Talent.StaffcraftingEmpoweredStrikeTracker.class) != null) {
 						buff(Talent.StaffcraftingEmpoweredStrikeTracker.class).detach();
-						dmg = Math.round( dmg * 1.3f);
+						dmg = Math.round( dmg * 1.4f);
 						// if we have empowered strike II, penetrate armor
 						if(Dungeon.hero.pointsInTalent(Talent.STAFFCRAFTING_EMPOWERED) == 2 )
 							dr = 0;
