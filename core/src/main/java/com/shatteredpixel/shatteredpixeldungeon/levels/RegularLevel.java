@@ -441,7 +441,7 @@ public abstract class RegularLevel extends Level {
 
 		//craft mastery drops additional consumable every level
 		if (Dungeon.hero.hasTalent(Talent.CRAFT_MASTERY)){
-			switch(Random.Int(7)) {
+			switch(Random.Int(8)) {
 				case 0: case 1: default:
 					item = Generator.random(Generator.Category.SCROLL);
 					break;
