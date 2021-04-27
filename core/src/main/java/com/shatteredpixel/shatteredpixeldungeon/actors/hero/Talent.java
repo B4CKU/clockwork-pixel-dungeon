@@ -29,6 +29,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArmorDamage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArtifactRecharge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Berserk;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Corruption;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
@@ -39,6 +40,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Recharging;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.WandEmpower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Wraith;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.effects.SpellSprite;
@@ -149,6 +151,7 @@ public enum Talent {
 	public static class SeerShotCooldown extends FlavourBuff{};
 	public static class SteadyAimCooldown extends FlavourBuff{};
 	public static class StaffcraftingEmpoweredStrikeTracker extends FlavourBuff{};
+	public static class NightmareCooldown extends FlavourBuff{};
 
 	int icon;
 	int maxPoints;
@@ -494,14 +497,14 @@ public enum Talent {
 			else if (enemy.buff(ArmorDamage.ArmorBreak.class) == null) Buff.affect( enemy, ArmorDamage.class, ArmorDamage.DURATION/2f );
 		}
 
-		if (hero.hasTalent(Talent.ARCANE_MASTERY) && (hero.belongings.weapon instanceof MeleeWeapon)) {
+		if (hero.hasTalent(Talent.ARCANE_MASTERY) && hero.belongings.weapon instanceof MeleeWeapon) {
 			for (Wand.Charger c : hero.buffs(Wand.Charger.class)){
 				c.gainCharge(0.25f);
 			}
 		}
 
 		//this is kinda ugly, but it will do for now
-		if (hero.pointsInTalent(Talent.BERSERKING_ANGER) == 2 && hero.buff(AngerIssuesTracker.class) == null) {
+		if (hero.pointsInTalent(Talent.BERSERKING_ANGER) == 2 && hero.buff(AngerIssuesTracker.class) == null && hero.belongings.weapon instanceof MeleeWeapon) {
 			Berserk berserk = hero.buff(Berserk.class);
 			if (berserk != null && berserk.rageAmount() >= 0.8f) {
 
@@ -525,8 +528,40 @@ public enum Talent {
 			}
 		}
 
+		if (hero.pointsInTalent(Talent.DREAMWEAVER_NIGHTMARE) == 2 && hero.buff(NightmareCooldown.class) == null
+				&& hero.belongings.weapon instanceof MeleeWeapon && enemy instanceof Mob && ((Mob)enemy).state == ((Mob)enemy).SLEEPING ) {
+
+			ArrayList<Integer> positions = new ArrayList<>();
+			for (int i : PathFinder.NEIGHBOURS8){
+				positions.add(i);
+			}
+			Random.shuffle( positions );
+
+			for(int n : positions) {
+				Wraith w = Wraith.spawnAt(enemy.pos + n);
+				if (w != null) {
+					Buff.affect(w, Corruption.class);
+					Buff.affect(w, NightmareTracker.class, 8f);
+					w.aggro( enemy);
+					Sample.INSTANCE.play(Assets.Sounds.CURSED);
+					Buff.affect(hero, NightmareCooldown.class, 15f);
+					break;
+				}
+			}
+		}
+
+
+
 		return dmg;
 	}
+
+	public static class NightmareTracker extends FlavourBuff{
+		@Override
+		public boolean act() {
+			target.die(null);
+			return true;
+		}
+	};
 
 	public static class SuckerPunchTracker extends Buff{};
 	public static class FollowupStrikeTracker extends Buff{};
