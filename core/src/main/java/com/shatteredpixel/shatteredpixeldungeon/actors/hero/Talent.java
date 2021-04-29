@@ -29,18 +29,16 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArmorDamage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArtifactRecharge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Berserk;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Corruption;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Hunger;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.KnightShield;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Recharging;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.WandEmpower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Wraith;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.effects.SpellSprite;
@@ -151,7 +149,7 @@ public enum Talent {
 	public static class SeerShotCooldown extends FlavourBuff{};
 	public static class SteadyAimCooldown extends FlavourBuff{};
 	public static class StaffcraftingEmpoweredStrikeTracker extends FlavourBuff{};
-	public static class NightmareCooldown extends FlavourBuff{};
+	public static class SandmanCooldown extends FlavourBuff{};
 
 	int icon;
 	int maxPoints;
@@ -528,26 +526,20 @@ public enum Talent {
 			}
 		}
 
-		if (hero.pointsInTalent(Talent.DREAMWEAVER_NIGHTMARE) == 2 && hero.buff(NightmareCooldown.class) == null
-				&& hero.belongings.weapon instanceof MeleeWeapon && enemy instanceof Mob && ((Mob)enemy).state == ((Mob)enemy).SLEEPING ) {
-
-			ArrayList<Integer> positions = new ArrayList<>();
-			for (int i : PathFinder.NEIGHBOURS8){
-				positions.add(i);
+		if (hero.hasTalent(DREAMWEAVER_NIGHTMARE) && hero.belongings.weapon instanceof MeleeWeapon
+				&& enemy instanceof Mob && ((Mob)enemy).state == ((Mob)enemy).SLEEPING ) {
+			//FIXME: this doesn't work with magical sleep
+			//why
+			//why wouldn't it work
+			//why has god forsaken me
+			//are we here only to suffer and die?
+			//why
+			//update: it worked once and i didn't even touch this wtf is happening
+			if (hero.pointsInTalent(DREAMWEAVER_NIGHTMARE) == 2) {
+				Dungeon.hero.HP = (int) Math.ceil(Math.min(Dungeon.hero.HT, Dungeon.hero.HP + dmg));
 			}
-			Random.shuffle( positions );
-
-			for(int n : positions) {
-				Wraith w = Wraith.spawnAt(enemy.pos + n);
-				if (w != null) {
-					Buff.affect(w, Corruption.class);
-					Buff.affect(w, NightmareTracker.class, 8f);
-					w.aggro( enemy);
-					Sample.INSTANCE.play(Assets.Sounds.CURSED);
-					Buff.affect(hero, NightmareCooldown.class, 15f);
-					break;
-				}
-			}
+			Buff.affect(Dungeon.hero, Hunger.class).affectHunger(dmg);
+			Dungeon.hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), 3);
 		}
 
 

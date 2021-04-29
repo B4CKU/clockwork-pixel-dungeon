@@ -29,8 +29,11 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Blindness;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Degrade;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Drowsy;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicalSleep;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.Bag;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
@@ -558,6 +561,20 @@ public class Item implements Bundlable {
 									Buff.affect(curUser, Talent.ImprovisedProjectileCooldown.class, 30f);
 								}
 							}
+							if (curUser.hasTalent(Talent.DREAMWEAVER_SANDMAN)
+									&& !(Item.this instanceof MissileWeapon)
+									&& curUser.buff(Talent.SandmanCooldown.class) == null){
+								if (enemy != null && enemy.alignment != curUser.alignment){
+									Sample.INSTANCE.play(Assets.Sounds.HIT);
+									//TODO: turn this into regular sleep
+									if(curUser.pointsInTalent(Talent.DREAMWEAVER_SANDMAN)==2 && ((Mob)enemy).state == ((Mob)enemy).WANDERING)
+										Buff.affect(enemy, MagicalSleep.class);
+									else
+										Buff.affect( enemy, Drowsy.class );
+									Buff.affect(curUser, Talent.SandmanCooldown.class, 30f);
+								}
+							}
+
 							if (user.buff(Talent.LethalMomentumTracker.class) != null){
 								user.buff(Talent.LethalMomentumTracker.class).detach();
 								user.next();
