@@ -566,11 +566,10 @@ public class Item implements Bundlable {
 									&& curUser.buff(Talent.SandmanCooldown.class) == null){
 								if (enemy != null && enemy.alignment != curUser.alignment){
 									Sample.INSTANCE.play(Assets.Sounds.HIT);
-									//TODO: turn this into regular sleep
 									if(curUser.pointsInTalent(Talent.DREAMWEAVER_SANDMAN)==2 && ((Mob)enemy).state == ((Mob)enemy).WANDERING)
-										Buff.affect(enemy, MagicalSleep.class);
+										((Mob) enemy).state = ((Mob) enemy).SLEEPING;
 									else
-										Buff.affect( enemy, Drowsy.class );
+										Buff.affect( enemy, Drowsy.class ).regularSleep = true;
 									Buff.affect(curUser, Talent.SandmanCooldown.class, 30f);
 								}
 							}

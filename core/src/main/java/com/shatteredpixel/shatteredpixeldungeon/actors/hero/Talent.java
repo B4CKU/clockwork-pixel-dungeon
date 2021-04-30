@@ -535,6 +535,7 @@ public enum Talent {
 			//are we here only to suffer and die?
 			//why
 			//update: it worked once and i didn't even touch this wtf is happening
+			//update no.2: it's suddenly working, what the hell?
 			if (hero.pointsInTalent(DREAMWEAVER_NIGHTMARE) == 2) {
 				Dungeon.hero.HP = (int) Math.ceil(Math.min(Dungeon.hero.HT, Dungeon.hero.HP + dmg));
 			}
@@ -547,14 +548,6 @@ public enum Talent {
 		return dmg;
 	}
 
-	public static class NightmareTracker extends FlavourBuff{
-		@Override
-		public boolean act() {
-			target.die(null);
-			return true;
-		}
-	};
-
 	public static class SuckerPunchTracker extends Buff{};
 	public static class FollowupStrikeTracker extends Buff{};
 	public static class AngerIssuesTracker extends Buff{};
@@ -563,8 +556,7 @@ public enum Talent {
 		public boolean woken_up = false;
 		@Override
 		public boolean act() {
-			if ((target instanceof Mob && ((Mob)target).state != ((Mob)target).SLEEPING) || stacks >= 6)
-				woken_up = true;
+			if ((target instanceof Mob && ((Mob)target).state != ((Mob)target).SLEEPING) || stacks >= 6) { woken_up = true;	}
 			spend( TICK );
 			return true;
 		}
