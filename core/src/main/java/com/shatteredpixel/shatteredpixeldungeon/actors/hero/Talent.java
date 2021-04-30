@@ -53,6 +53,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRecharging;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
+import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfMagicMissile;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
@@ -127,7 +128,7 @@ public enum Talent {
 	STAFFCRAFTING(7, 1, WEAPON_MASTERY, ARCANE_MASTERY), STAFFCRAFTING_CHANNELING(8, 2, STAFFCRAFTING), STAFFCRAFTING_EMPOWERED(9, 2, STAFFCRAFTING),
 	BERSERKING(10 , 1, ARMOR_MASTERY, WEAPON_MASTERY), BERSERKING_ANGER(11 , 2, BERSERKING), BERSERKING_DETERMINATION(12 , 2, BERSERKING),
 	DREAMWEAVER(13, 1, AGILITY_MASTERY, ELEMENTAL_MASTERY), DREAMWEAVER_SANDMAN(14, 2, DREAMWEAVER), DREAMWEAVER_NIGHTMARE(15, 2, DREAMWEAVER),
-	ARMOR_ARCANE(0 , 1, ARMOR_MASTERY, ARCANE_MASTERY),
+	DARKARTS(16 , 1, ARMOR_MASTERY, ARCANE_MASTERY), DARKARTS_POWER(32 , 2, DARKARTS), DARKARTS_NECROMANCER(33 , 2, DARKARTS),
 	ARMOR_AGILITY(0, 1, ARMOR_MASTERY, AGILITY_MASTERY),
 	ARMOR_CRAFT(0, 1, ARMOR_MASTERY, CRAFT_MASTERY),
 	ARMOR_ELEMENTS(0, 1, ARMOR_MASTERY, ELEMENTAL_MASTERY),
@@ -261,7 +262,7 @@ public enum Talent {
 				}
 				break;
 			case STAFFCRAFTING:
-				MagesStaff staff = new MagesStaff();
+				MagesStaff staff = new MagesStaff(new WandOfMagicMissile());
 				if (!staff.identify().collect()) {
 					Dungeon.level.drop(staff, hero.pos);
 				}
@@ -528,14 +529,6 @@ public enum Talent {
 
 		if (hero.hasTalent(DREAMWEAVER_NIGHTMARE) && hero.belongings.weapon instanceof MeleeWeapon
 				&& enemy instanceof Mob && ((Mob)enemy).state == ((Mob)enemy).SLEEPING ) {
-			//FIXME: this doesn't work with magical sleep
-			//why
-			//why wouldn't it work
-			//why has god forsaken me
-			//are we here only to suffer and die?
-			//why
-			//update: it worked once and i didn't even touch this wtf is happening
-			//update no.2: it's suddenly working, what the hell?
 			if (hero.pointsInTalent(DREAMWEAVER_NIGHTMARE) == 2) {
 				Dungeon.hero.HP = (int) Math.ceil(Math.min(Dungeon.hero.HT, Dungeon.hero.HP + dmg));
 			}
@@ -628,7 +621,7 @@ public enum Talent {
 				break;
 			case ADVENTURER:
 				//technically all of them are available, but only some of them are visible at the time
-				Collections.addAll(tierTalents, STAFFCRAFTING, BERSERKING, ARMOR_ARCANE, ARMOR_AGILITY, ARMOR_CRAFT,
+				Collections.addAll(tierTalents, STAFFCRAFTING, BERSERKING, DARKARTS, ARMOR_AGILITY, ARMOR_CRAFT,
 												ARMOR_ELEMENTS,	WEAPON_AGILITY, WEAPON_CRAFT, WEAPON_ELEMENTS, ARCANE_AGILITY,
 												ARCANE_CRAFT, ARCANE_ELEMENTS, AGILITY_CRAFT, DREAMWEAVER, CRAFT_ELEMENTS);
 				break;
@@ -653,7 +646,7 @@ public enum Talent {
 				Collections.addAll(tierTalents, POINT_BLANK, SEER_SHOT);
 			case ADVENTURER:
 				Collections.addAll(tierTalents, STAFFCRAFTING_CHANNELING, STAFFCRAFTING_EMPOWERED, BERSERKING_ANGER, BERSERKING_DETERMINATION,
-						DREAMWEAVER_SANDMAN, DREAMWEAVER_NIGHTMARE);
+						DREAMWEAVER_SANDMAN, DREAMWEAVER_NIGHTMARE, DARKARTS_POWER, DARKARTS_NECROMANCER);
 				break;
 		}
 		for (Talent talent : tierTalents){
