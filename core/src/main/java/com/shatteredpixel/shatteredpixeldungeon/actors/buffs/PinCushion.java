@@ -21,12 +21,19 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.RunicHarpoon;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.MissileSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
+import com.watabou.noosa.audio.Sample;
+import com.watabou.noosa.tweeners.AlphaTweener;
 import com.watabou.utils.Bundle;
+import com.watabou.utils.Callback;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,6 +56,29 @@ public class PinCushion extends Buff {
 	public void detach() {
 		for (Item item : items)
 			Dungeon.level.drop( item, target.pos).sprite.drop();
+		super.detach();
+	}
+
+	public void spellshotRip(int pos) {
+		Sample.INSTANCE.play(Assets.Sounds.MISS);
+		for (Item item : items) {
+			//i have no clue how the fuck i made this work, i am so fucking happy
+			MissileSprite visual = ((MissileSprite) Dungeon.hero.sprite.parent.recycle(MissileSprite.class));
+
+			visual.reset( target.pos,
+					pos,
+					item,
+					new Callback() {
+						@Override
+						public void call() {
+							if (!(item instanceof RunicHarpoon) || Dungeon.hero.pointsInTalent(Talent.SPELLSHOT_HARPOON) < 2 || !item.doPickUp(Dungeon.hero))
+								Dungeon.level.drop(item, pos).sprite.drop();
+						}
+					});
+			visual.alpha(0f);
+			float duration = Dungeon.level.trueDistance(target.pos, pos) / 50f;
+			target.sprite.parent.add(new AlphaTweener(visual, 1f, duration));
+		}
 		super.detach();
 	}
 

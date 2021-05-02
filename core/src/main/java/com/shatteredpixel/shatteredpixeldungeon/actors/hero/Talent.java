@@ -58,6 +58,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.RunicHarpoon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -129,13 +130,13 @@ public enum Talent {
 	BERSERKING(10 , 1, ARMOR_MASTERY, WEAPON_MASTERY), BERSERKING_ANGER(11 , 2, BERSERKING), BERSERKING_DETERMINATION(12 , 2, BERSERKING),
 	DREAMWEAVER(13, 1, AGILITY_MASTERY, ELEMENTAL_MASTERY), DREAMWEAVER_SANDMAN(14, 2, DREAMWEAVER), DREAMWEAVER_NIGHTMARE(15, 2, DREAMWEAVER),
 	DARKARTS(16 , 1, ARMOR_MASTERY, ARCANE_MASTERY), DARKARTS_POWER(32 , 2, DARKARTS), DARKARTS_NECROMANCER(33 , 2, DARKARTS),
+	SPELLSHOT(34, 1, ARCANE_MASTERY, AGILITY_MASTERY), SPELLSHOT_ENCHANT(35 , 2, SPELLSHOT), SPELLSHOT_HARPOON(36 , 2, SPELLSHOT),
 	ARMOR_AGILITY(0, 1, ARMOR_MASTERY, AGILITY_MASTERY),
 	ARMOR_CRAFT(0, 1, ARMOR_MASTERY, CRAFT_MASTERY),
 	ARMOR_ELEMENTS(0, 1, ARMOR_MASTERY, ELEMENTAL_MASTERY),
 	WEAPON_AGILITY(0, 1, WEAPON_MASTERY, AGILITY_MASTERY),
 	WEAPON_CRAFT(0, 1, WEAPON_MASTERY, CRAFT_MASTERY),
 	WEAPON_ELEMENTS(0, 1, WEAPON_MASTERY, ELEMENTAL_MASTERY),
-	ARCANE_AGILITY(0, 1, ARCANE_MASTERY, AGILITY_MASTERY),
 	ARCANE_CRAFT(0, 1, ARCANE_MASTERY, CRAFT_MASTERY),
 	ARCANE_ELEMENTS(0, 1, ARCANE_MASTERY, ELEMENTAL_MASTERY),
 	AGILITY_CRAFT(0, 1, AGILITY_MASTERY, CRAFT_MASTERY),
@@ -264,7 +265,15 @@ public enum Talent {
 			case STAFFCRAFTING:
 				MagesStaff staff = new MagesStaff(new WandOfMagicMissile());
 				if (!staff.identify().collect()) {
-					Dungeon.level.drop(staff, hero.pos);
+					Dungeon.level.drop(staff, hero.pos).sprite.drop();;
+				}
+				break;
+			case SPELLSHOT_HARPOON:
+				if (points == 1) {
+					RunicHarpoon harpoon = new RunicHarpoon();
+					if (!harpoon.collect()) {
+						Dungeon.level.drop(harpoon, hero.pos).sprite.drop();
+					}
 				}
 				break;
 		}
@@ -621,8 +630,8 @@ public enum Talent {
 				break;
 			case ADVENTURER:
 				//technically all of them are available, but only some of them are visible at the time
-				Collections.addAll(tierTalents, STAFFCRAFTING, BERSERKING, DARKARTS, ARMOR_AGILITY, ARMOR_CRAFT,
-												ARMOR_ELEMENTS,	WEAPON_AGILITY, WEAPON_CRAFT, WEAPON_ELEMENTS, ARCANE_AGILITY,
+				Collections.addAll(tierTalents, STAFFCRAFTING, BERSERKING, DARKARTS, SPELLSHOT, ARMOR_AGILITY,
+												ARMOR_CRAFT, ARMOR_ELEMENTS, WEAPON_AGILITY, WEAPON_CRAFT, WEAPON_ELEMENTS,
 												ARCANE_CRAFT, ARCANE_ELEMENTS, AGILITY_CRAFT, DREAMWEAVER, CRAFT_ELEMENTS);
 				break;
 		}
@@ -646,7 +655,7 @@ public enum Talent {
 				Collections.addAll(tierTalents, POINT_BLANK, SEER_SHOT);
 			case ADVENTURER:
 				Collections.addAll(tierTalents, STAFFCRAFTING_CHANNELING, STAFFCRAFTING_EMPOWERED, BERSERKING_ANGER, BERSERKING_DETERMINATION,
-						DREAMWEAVER_SANDMAN, DREAMWEAVER_NIGHTMARE, DARKARTS_POWER, DARKARTS_NECROMANCER);
+						DREAMWEAVER_SANDMAN, DREAMWEAVER_NIGHTMARE, DARKARTS_POWER, DARKARTS_NECROMANCER, SPELLSHOT_ENCHANT, SPELLSHOT_HARPOON);
 				break;
 		}
 		for (Talent talent : tierTalents){
