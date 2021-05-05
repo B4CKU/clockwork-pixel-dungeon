@@ -32,6 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.PinCushion;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.KindOfWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.Bag;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.MagicalHolster;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfSharpshooting;
@@ -207,6 +208,18 @@ abstract public class MissileWeapon extends Weapon {
 				SpiritBow bow = Dungeon.hero.belongings.getItem(SpiritBow.class);
 				if (bow != null && bow.enchantment != null && Dungeon.hero.buff(MagicImmune.class) == null) {
 					damage = bow.enchantment.proc(this, attacker, defender, damage);
+				}
+			}
+		}
+		if (attacker == Dungeon.hero && Dungeon.hero.hasTalent(Talent.SPELLSHOT_ENCHANT)){
+			if (this instanceof Dart && ((Dart) this).crossbowHasEnchant(Dungeon.hero)){
+				//still do nothing
+			} else if (this instanceof RunicHarpoon && enchantment != null && attacker.buff(MagicImmune.class) == null) {
+				//don't do anything either
+			} else {
+				KindOfWeapon curWeapon = Dungeon.hero.belongings.stashedWeapon;
+				if (curWeapon instanceof Weapon && ((Weapon)curWeapon).enchantment != null && Dungeon.hero.buff(MagicImmune.class) == null) {
+					damage = ((Weapon)curWeapon).enchantment.proc(this, attacker, defender, damage);
 				}
 			}
 		}
