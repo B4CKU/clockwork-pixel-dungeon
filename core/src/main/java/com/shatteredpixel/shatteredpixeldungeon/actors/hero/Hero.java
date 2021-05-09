@@ -32,6 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Alchemy;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AdrenalineSurge;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AlchemicalAura;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Awareness;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barkskin;
@@ -1451,6 +1452,9 @@ public class Hero extends Char {
 		
 		AlchemistsToolkit.kitEnergy kit = buff(AlchemistsToolkit.kitEnergy.class);
 		if (kit != null) kit.gainCharge(percent);
+
+		AlchemicalAura aura = buff(AlchemicalAura.class);
+		if (aura != null) aura.gainEnergy(percent);
 		
 		Berserk berserk = buff(Berserk.class);
 		if (berserk != null) berserk.recover(percent);

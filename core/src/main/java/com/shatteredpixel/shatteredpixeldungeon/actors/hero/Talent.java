@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AlchemicalAura;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArmorDamage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArtifactRecharge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Berserk;
@@ -131,13 +132,13 @@ public enum Talent {
 	DREAMWEAVER(13, 1, AGILITY_MASTERY, ELEMENTAL_MASTERY), DREAMWEAVER_SANDMAN(14, 2, DREAMWEAVER), DREAMWEAVER_NIGHTMARE(15, 2, DREAMWEAVER),
 	DARKARTS(16 , 1, ARMOR_MASTERY, ARCANE_MASTERY), DARKARTS_POWER(32 , 2, DARKARTS), DARKARTS_NECROMANCER(33 , 2, DARKARTS),
 	SPELLSHOT(34, 1, ARCANE_MASTERY, AGILITY_MASTERY), SPELLSHOT_ENCHANT(35 , 2, SPELLSHOT), SPELLSHOT_HARPOON(36 , 2, SPELLSHOT),
+	ALCHEMY(37, 1, ARCANE_MASTERY, CRAFT_MASTERY), ALCHEMY_SPELLS(38 , 2, ALCHEMY), ALCHEMY_SUMMONS(39 , 2, ALCHEMY),
 	ARMOR_AGILITY(0, 1, ARMOR_MASTERY, AGILITY_MASTERY),
 	ARMOR_CRAFT(0, 1, ARMOR_MASTERY, CRAFT_MASTERY),
 	ARMOR_ELEMENTS(0, 1, ARMOR_MASTERY, ELEMENTAL_MASTERY),
 	WEAPON_AGILITY(0, 1, WEAPON_MASTERY, AGILITY_MASTERY),
 	WEAPON_CRAFT(0, 1, WEAPON_MASTERY, CRAFT_MASTERY),
 	WEAPON_ELEMENTS(0, 1, WEAPON_MASTERY, ELEMENTAL_MASTERY),
-	ARCANE_CRAFT(0, 1, ARCANE_MASTERY, CRAFT_MASTERY),
 	ARCANE_ELEMENTS(0, 1, ARCANE_MASTERY, ELEMENTAL_MASTERY),
 	AGILITY_CRAFT(0, 1, AGILITY_MASTERY, CRAFT_MASTERY),
 	CRAFT_ELEMENTS(0, 1, CRAFT_MASTERY, ELEMENTAL_MASTERY);
@@ -275,6 +276,9 @@ public enum Talent {
 						Dungeon.level.drop(harpoon, hero.pos).sprite.drop();
 					}
 				}
+				break;
+			case ALCHEMY:
+				Buff.affect(hero, AlchemicalAura.class);
 				break;
 		}
 
@@ -630,9 +634,9 @@ public enum Talent {
 				break;
 			case ADVENTURER:
 				//technically all of them are available, but only some of them are visible at the time
-				Collections.addAll(tierTalents, STAFFCRAFTING, BERSERKING, DARKARTS, SPELLSHOT, ARMOR_AGILITY,
-												ARMOR_CRAFT, ARMOR_ELEMENTS, WEAPON_AGILITY, WEAPON_CRAFT, WEAPON_ELEMENTS,
-												ARCANE_CRAFT, ARCANE_ELEMENTS, AGILITY_CRAFT, DREAMWEAVER, CRAFT_ELEMENTS);
+				Collections.addAll(tierTalents, STAFFCRAFTING, BERSERKING, DARKARTS, SPELLSHOT, ALCHEMY,
+												ARMOR_AGILITY,	ARMOR_CRAFT, ARMOR_ELEMENTS, WEAPON_AGILITY, WEAPON_CRAFT,
+												WEAPON_ELEMENTS, ARCANE_ELEMENTS, AGILITY_CRAFT, DREAMWEAVER, CRAFT_ELEMENTS);
 				break;
 		}
 		for (Talent talent : tierTalents){
@@ -655,7 +659,8 @@ public enum Talent {
 				Collections.addAll(tierTalents, POINT_BLANK, SEER_SHOT);
 			case ADVENTURER:
 				Collections.addAll(tierTalents, STAFFCRAFTING_CHANNELING, STAFFCRAFTING_EMPOWERED, BERSERKING_ANGER, BERSERKING_DETERMINATION,
-						DREAMWEAVER_SANDMAN, DREAMWEAVER_NIGHTMARE, DARKARTS_POWER, DARKARTS_NECROMANCER, SPELLSHOT_ENCHANT, SPELLSHOT_HARPOON);
+						DREAMWEAVER_SANDMAN, DREAMWEAVER_NIGHTMARE, DARKARTS_POWER, DARKARTS_NECROMANCER, SPELLSHOT_ENCHANT, SPELLSHOT_HARPOON,
+						ALCHEMY_SPELLS, ALCHEMY_SUMMONS);
 				break;
 		}
 		for (Talent talent : tierTalents){
