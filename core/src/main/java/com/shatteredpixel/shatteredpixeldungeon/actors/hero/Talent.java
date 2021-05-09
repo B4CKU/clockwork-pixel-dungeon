@@ -266,7 +266,7 @@ public enum Talent {
 			case STAFFCRAFTING:
 				MagesStaff staff = new MagesStaff(new WandOfMagicMissile());
 				if (!staff.identify().collect()) {
-					Dungeon.level.drop(staff, hero.pos).sprite.drop();;
+					Dungeon.level.drop(staff, hero.pos).sprite.drop();
 				}
 				break;
 			case SPELLSHOT_HARPOON:

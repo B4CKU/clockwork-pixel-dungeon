@@ -281,7 +281,11 @@ public class Potion extends Item {
 			super.doThrow( hero );
 		}
 	}
-	
+
+	public void doDrink( Hero hero ) {
+		drink(hero);
+	}
+
 	protected void drink( Hero hero ) {
 		
 		detach( hero.belongings.backpack );
