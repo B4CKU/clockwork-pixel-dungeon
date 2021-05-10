@@ -153,6 +153,7 @@ public enum Talent {
 	public static class SteadyAimCooldown extends FlavourBuff{};
 	public static class StaffcraftingEmpoweredStrikeTracker extends FlavourBuff{};
 	public static class SandmanCooldown extends FlavourBuff{};
+	public static class HallowedGroundCooldown extends FlavourBuff{};
 
 	int icon;
 	int maxPoints;

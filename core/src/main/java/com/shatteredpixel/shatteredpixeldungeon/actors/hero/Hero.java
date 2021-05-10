@@ -52,10 +52,12 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Momentum;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Regeneration;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.SnipersMark;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.SoulMark;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.SteadyAim;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vertigo;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Monk;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Shambler;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CheckedCell;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Flare;
@@ -184,7 +186,7 @@ public class Hero extends Char {
 	private ArrayList<Mob> visibleEnemies;
 
 	//This list is maintained so that some logic checks can be skipped
-	// for enemies we know we aren't seeing normally, resultign in better performance
+	// for enemies we know we aren't seeing normally, resulting in better performance
 	public ArrayList<Mob> mindVisionEnemies = new ArrayList<>();
 
 	public Hero() {
@@ -1075,6 +1077,22 @@ public class Hero extends Char {
 			}
 			if (hasTalent(Talent.AGILITY_MASTERY) && buff(Talent.SteadyAimCooldown.class ) == null){
 				Buff.affect(this, SteadyAim.class);
+			}
+			if (hasTalent(Talent.DARKARTS_NECROMANCER) && buff(Talent.HallowedGroundCooldown.class ) == null){
+				int v = visibleEnemies();
+				int shamblersToSpawn = 0;
+
+				for (int i=0; i < v; i++) {
+					Mob mob = visibleEnemy( i );
+					if(mob.buff(SoulMark.class) != null /*&& mob.isAlive()*/ && !mindVisionEnemies.contains(mob))
+						shamblersToSpawn += 2;
+				}
+				if (shamblersToSpawn > 0) {
+					Sample.INSTANCE.play(Assets.Sounds.BONES);
+					Shambler.spawnFew(pos, shamblersToSpawn);
+					Buff.affect(this, Talent.HallowedGroundCooldown.class, 6f);
+				}
+
 			}
 			if (sprite != null) {
 				sprite.showStatus(CharSprite.DEFAULT, Messages.get(this, "wait"));
