@@ -54,11 +54,9 @@ public class Shambler extends NPC {
 	
 	{
 		spriteClass = ShamblerSprite.class;
-		
-		HP = HT = 1;
-		EXP = 0;
 
-		maxLvl = -2;
+		// commented out, because NPC already does that, but i want to remember how much HP they have
+		//HP = HT = 1;
 
 		alignment = Alignment.ALLY;
 		state = HUNTING;
@@ -125,23 +123,17 @@ public class Shambler extends NPC {
 	}
 	
 	public static Shambler spawnAt(int pos ) {
-		if (!Dungeon.level.solid[pos] && Actor.findChar( pos ) == null) {
-			
-			Shambler w = new Shambler();
-			w.adjustStats( Dungeon.depth );
-			w.pos = pos;
-			w.state = w.HUNTING;
-			GameScene.add( w, SPAWN_DELAY );
-			Dungeon.level.pressCell(w.pos);
+		Shambler w = new Shambler();
+		w.adjustStats( Dungeon.depth );
+		w.pos = pos;
+		GameScene.add( w, SPAWN_DELAY );
+		Dungeon.level.pressCell(w.pos);
 
-			if (w.sprite.visible) {
-				w.sprite.emitter().burst(Speck.factory(Speck.RATTLE), 5);
-			}
-
-			return w;
-		} else {
-			return null;
+		if (w.sprite.visible) {
+			w.sprite.emitter().burst(Speck.factory(Speck.RATTLE), 5);
 		}
+
+		return w;
 	}
 
 	private class Wandering extends Mob.Wandering{
