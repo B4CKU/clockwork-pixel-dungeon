@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.spells;
 
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AlchemicalAura;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.AlchemicalCatalyst;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -49,12 +50,12 @@ public class Alchemize extends Spell implements AlchemyScene.AlchemyProvider {
 	
 	@Override
 	public int getEnergy() {
-		return 0;
+		return AlchemicalAura.heroGetEnergy();
 	}
 	
 	@Override
 	public void spendEnergy(int reduction) {
-		//do nothing
+		AlchemicalAura.heroUseEnergy(reduction);
 	}
 	
 	@Override

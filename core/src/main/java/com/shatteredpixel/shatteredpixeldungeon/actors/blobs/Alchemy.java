@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.blobs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AlchemicalAura;
 import com.shatteredpixel.shatteredpixeldungeon.effects.BlobEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Notes;
@@ -60,11 +61,11 @@ public class Alchemy extends Blob implements AlchemyScene.AlchemyProvider {
 	
 	@Override
 	public int getEnergy() {
-		return Math.max(0, cur[alchPos] - 1);
+		return Math.max(0, cur[alchPos] - 1 + AlchemicalAura.heroGetEnergy());
 	}
 	
 	@Override
 	public void spendEnergy(int reduction) {
-		cur[alchPos] = Math.max(1, cur[alchPos] - reduction);
+		cur[alchPos] = Math.max(1, cur[alchPos] - AlchemicalAura.heroUseEnergy(reduction));
 	}
 }

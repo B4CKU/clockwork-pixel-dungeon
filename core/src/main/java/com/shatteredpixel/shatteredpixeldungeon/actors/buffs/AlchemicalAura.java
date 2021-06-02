@@ -21,13 +21,10 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
-import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.AlchemistsToolkit;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.scenes.AlchemyScene;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
-import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
-import com.watabou.noosa.Image;
 import com.watabou.utils.Bundle;
 
 public class AlchemicalAura extends Buff {
@@ -64,20 +61,34 @@ public class AlchemicalAura extends Buff {
 
 	}
 
+	public static int heroGetEnergy() {
+		if(Dungeon.hero != null) {
+			AlchemicalAura aura = Dungeon.hero.buff(AlchemicalAura.class);
+			if (aura != null) {
+				return aura.getEnergy();
+			}
+		}
+		return 0;
+	}
+
 	public int getEnergy() {
 		return energy;
 	}
 
-	public void useEnergy(int energyUsed) {
-		energy = Math.max(0, energy - energyUsed);
+	public static int heroUseEnergy( int energyUsed) {
+		if(Dungeon.hero != null) {
+			AlchemicalAura aura = Dungeon.hero.buff(AlchemicalAura.class);
+			if (aura != null) {
+				return aura.useEnergy(energyUsed);
+			}
+		}
+		return energyUsed;
 	}
 
-	public boolean checkUseEnergy(int energyUsed) {
-		if(energy - energyUsed >= 0) {
-			energy = energy - energyUsed;
-			return true;
-		} else
-			return false;
+	public int useEnergy(int energyUsed) {
+		int energyRequired = Math.max(0, energyUsed - energy);
+		energy = Math.max(0, energy - energyUsed);
+		return energyRequired;
 	}
 
 	@Override
