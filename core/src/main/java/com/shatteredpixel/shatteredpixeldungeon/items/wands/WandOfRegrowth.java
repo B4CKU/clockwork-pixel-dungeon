@@ -34,6 +34,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Doom;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.NPC;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
@@ -78,7 +79,7 @@ public class WandOfRegrowth extends Wand {
 		plantGrass(bolt.collisionPos);
 		//..cripples enemies hit..
 		if(cha != null) {
-			Buff.prolong( cha, Cripple.class, 8f);
+			Buff.prolong( cha, Cripple.class, randomCrippleDuration(buffedLvl()));
 			processSoulMark(cha, chargesPerCast());
 		}
 		//..or spawns a vine lasher if there is none and the ground is suitable..
@@ -87,7 +88,6 @@ public class WandOfRegrowth extends Wand {
 			vinelasher.pos = bolt.collisionPos;
 			GameScene.add(vinelasher, 0f);
 			Dungeon.level.occupyCell(vinelasher);
-			//CellEmitter.get( vinelasher.pos ).burst( LeafParticle.GENERAL, 6 );
 			vinelasher.sprite.emitter().burst(LeafParticle.GENERAL, 6);
 		}
 		//We don't want the lasher inside the grass and also it could be used for triggering traps
@@ -100,7 +100,10 @@ public class WandOfRegrowth extends Wand {
 			positions.add(i);
 		}
 		Random.shuffle( positions );
-		int plants = 1 + (buffedLvl()/2);
+
+		//int plants = 1 + (buffedLvl()/2);
+		int plants = Math.min(8, 1 + (buffedLvl()/2));
+
 		for (int i : positions){
 			if (plantGrass(bolt.collisionPos + i)){
 				if (plants > 0) {
@@ -126,6 +129,10 @@ public class WandOfRegrowth extends Wand {
 			return true;
 		}
 		return false;
+	}
+
+	private float randomCrippleDuration(int level){
+		return Random.NormalIntRange(1 + level/2, 6 + level);
 	}
 
 	@Override
@@ -165,9 +172,9 @@ public class WandOfRegrowth extends Wand {
 	@Override
 	public String statsDesc() {
 		if (levelKnown)
-			return Messages.get(this, "stats_desc", 1+buffedLvl(), 4+2*buffedLvl());
+			return Messages.get(this, "stats_desc", 1 + buffedLvl()/2, 6 + buffedLvl(), 1+buffedLvl(), 4+2*buffedLvl());
 		else
-			return Messages.get(this, "stats_desc", 1, 4);
+			return Messages.get(this, "stats_desc", 1, 6, 1, 4);
 	}
 
 	@Override
@@ -359,7 +366,10 @@ public class WandOfRegrowth extends Wand {
 
 			HP = HT = 40;
 			defenseSkill = 0;
-			state = WANDERING;
+			viewDistance = 3;
+
+			state = HUNTING;
+			WANDERING = new Wandering();
 
 			alignment = Alignment.ALLY;
 
@@ -372,17 +382,10 @@ public class WandOfRegrowth extends Wand {
 
 		public VineLasher(int wandLvl){
 			wandLevel = wandLvl;
-			HP = HT = 12 + 4 * wandLevel;
+			HP = HT = 10 + 4 * wandLevel;
 		}
 
 		public VineLasher(){}
-
-		@Override
-		protected boolean act() {
-			damage( Math.max( 1, (int)(HT * 0.05)), this);
-			if (!isAlive()) return true;
-			return super.act();
-		}
 
 		@Override
 		public void damage(int dmg, Object src) {
@@ -411,29 +414,27 @@ public class WandOfRegrowth extends Wand {
 			return 4+2*lvl;
 		}
 
+		private boolean isWeak(Char enemy) {
+			if (enemy.buff(Cripple.class) != null || enemy.buff(Paralysis.class) != null || enemy.buff(Roots.class) != null)
+				return true;
+			else
+				return false;
+		}
+
 		@Override
 		public int damageRoll() {
 			return Random.NormalIntRange(minDmg(wandLevel), maxDmg(wandLevel));
 		}
 
-		//increases the duration of roots and cripple and if the target has more than 10 turns of cripple, roots them
 		@Override
 		public int attackProc(Char enemy, int damage) {
 			damage = super.attackProc( enemy, damage );
-			if (enemy.buff(Roots.class) != null) {
-				Buff.affect( enemy, Roots.class, 1f );
-			}
-			else {
-				Cripple cripple = enemy.buff(Cripple.class);
-				if (cripple != null && cripple.cooldown() > 10f) {
-					Buff.affect( enemy, Roots.class, Cripple.DURATION);
-					Buff.detach( enemy, Cripple.class );
-				}
-				else Buff.affect( enemy, Cripple.class, 1f);
-			}
 
+			//if the target doesn't have any of those buffs, attack three times as slow
+			if (!isWeak(enemy))
+				spend( attackDelay() * 2 );
 
-			return super.attackProc(enemy, damage);
+			return damage;
 		}
 
 		//basically hero accuracy given the hero levels up once every depth
@@ -450,7 +451,10 @@ public class WandOfRegrowth extends Wand {
 		//can attack enemies within two tiles range, but only if they are stunned, crippled or paralyzed
 		@Override
 		protected boolean canAttack(Char enemy) {
-			return (enemy.buff(Cripple.class) != null || enemy.buff(Paralysis.class) != null || enemy.buff(Roots.class) != null) && (fieldOfView[enemy.pos] && Dungeon.level.distance(pos, enemy.pos) <= 2);
+			int range = 1;
+			if (isWeak(enemy))
+				range++;
+			return (fieldOfView[enemy.pos] && Dungeon.level.distance(pos, enemy.pos) <= range);
 		}
 
 		@Override
@@ -508,5 +512,17 @@ public class WandOfRegrowth extends Wand {
 			immunities.add( ToxicGas.class );
 			immunities.add( Corruption.class );
 		}
+
+		private class Wandering extends Mob.Wandering{
+
+			@Override
+			public boolean act(boolean enemyInFOV, boolean justAlerted) {
+				if (!enemyInFOV) damage( Math.max( 1, (int)(HT * 0.2)), this);
+				if (!isAlive()) return true;
+				return super.act(enemyInFOV, justAlerted);
+			}
+
+		}
+
 	}
 }
